@@ -1,9 +1,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context=".MainActivity">
 
     <LinearLayout
         android:orientation="vertical"
@@ -16,44 +19,93 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal"
-            android:layout_weight=".95"
-            android:gravity="right"
-            android:id="@+id/textView">
+            android:layout_weight="1">
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="0"
+                android:id="@+id/outputText"
+                android:textSize="50dp"
+                android:layout_weight="1"
+                android:background="#323232"
+                android:gravity="right"
+                android:paddingRight="10dp" />
+        </LinearLayout>
+        <!--
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#2f2f2f"
+            android:paddingRight="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text="14"
-                android:id="@+id/textView"
-                android:layout_gravity="center_horizontal"
-                android:textIsSelectable="false"
-                android:textSize="50dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="feet"
-                android:id="@+id/textView2" />
+                android:id="@+id/numInches"
+                android:layout_alignParentTop="false"
+                android:layout_alignParentRight="false"
+                android:textSize="50dp"
+                android:layout_toLeftOf="@+id/numFraction"
+                android:paddingLeft="15dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="7"
-                android:id="@+id/textView3"
-                android:textSize="50dp" />
+                android:text="1/2"
+                android:id="@+id/numFraction"
+                android:layout_alignParentTop="false"
+                android:layout_alignParentBottom="false"
+                android:layout_alignParentRight="false"
+                android:textSize="25dp"
+                android:gravity="top"
+                android:layout_toLeftOf="@+id/txtInches" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="inches"
-                android:id="@+id/textView4" />
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="3"
+                android:id="@+id/numFeet"
+                android:textSize="50dp"
+                android:layout_alignParentTop="false"
+                android:layout_alignParentRight="false"
+                android:layout_toLeftOf="@+id/txtFeet" />
 
-        </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="in"
+                android:id="@+id/txtInches"
+                android:textSize="20dp"
+                android:layout_alignParentLeft="false"
+                android:layout_alignParentStart="false"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="false"
+                android:layout_alignParentTop="false"
+                android:layout_alignParentEnd="false"
+                android:layout_alignBottom="@+id/numInches" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="ft"
+                android:id="@+id/txtFeet"
+                android:textSize="20dp"
+                android:layout_alignParentLeft="false"
+                android:layout_alignParentStart="false"
+                android:layout_alignParentRight="false"
+                android:layout_toLeftOf="@+id/numInches"
+                android:layout_alignBottom="@+id/numFeet" />
+
+        </RelativeLayout>
+        -->
 
         <LinearLayout
             android:orientation="horizontal"
@@ -189,7 +241,7 @@
                 style="?android:attr/buttonStyleSmall"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="×"
+                android:text="x"
                 android:id="@+id/multiply"
                 android:layout_weight="1" />
 
@@ -268,4 +320,5 @@
         </LinearLayout>
 
     </LinearLayout>
+
 </RelativeLayout>
