@@ -21,9 +21,6 @@ public class MainActivity extends Activity {
     String buttonString = "";
     String numInputString = "";
 
-
-
-
     // for rounding to a specific fraction resolution:
     //Math.round(myFloat*16) / 16f
 
@@ -58,6 +55,8 @@ public class MainActivity extends Activity {
         // update the DEBUG window
         TextView debugText = (TextView) findViewById(R.id.debug);
         debugText.setText(operationList.toString());
+        // start calculate function
+        calcualte();
     }
 
     public void clear(View view) {
@@ -70,7 +69,9 @@ public class MainActivity extends Activity {
         numInputString = "";
     }
 
-
+    public void calcualte() {
+        operationList
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
