@@ -1,6 +1,8 @@
 package com.example.seankraft.constructioncalc;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -17,7 +19,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
     }
 
-    ArrayList<String> operationList = new ArrayList<>();
+    ArrayList<String> opList = new ArrayList<>();
     String buttonString = "";
     String numInputString = "";
 
@@ -37,24 +39,24 @@ public class MainActivity extends Activity {
     // function to receive operation button clicks
     public void clickOperation(View view) {
         // add the current concatenated number to operation list
-        operationList.add(numInputString);
+        opList.add(numInputString);
         // add the clicked operator to the operation list
         Button numberButton = (Button) view;
         buttonString = numberButton.getText().toString();
-        operationList.add(buttonString);
+        opList.add(buttonString);
         // update the DEBUG window
         TextView debugText = (TextView) findViewById(R.id.debug);
-        debugText.setText(operationList.toString());
+        debugText.setText(opList.toString());
         // clear the numInputString for the next number entry
         numInputString = "";
     }
 
     public void clickCalculate(View view) {
         // add the current concatenated number to operation list
-        operationList.add(numInputString);
+        opList.add(numInputString);
         // update the DEBUG window
         TextView debugText = (TextView) findViewById(R.id.debug);
-        debugText.setText(operationList.toString());
+        debugText.setText(opList.toString());
         // start calculate function
         calcualte();
     }
@@ -65,12 +67,66 @@ public class MainActivity extends Activity {
         outputText.setText("0");
         debugText.setText("");
         // clear variables
-        operationList = new ArrayList<>();
+        opList = new ArrayList<>();
         numInputString = "";
     }
 
     public void calcualte() {
-        operationList
+        int output = 0;
+
+        while (opList.size() > 1) {
+            if (opList.contains("x")) {
+                for (int i = 0; i < opList.size(); i++) {
+                    if (opList.get(i).contains("x")) {
+                        output = Integer.parseInt(opList.get(i - 1)) * Integer.parseInt(opList.get(i + 1));
+                        opList.remove(i + 1);
+                        opList.remove(i);
+                        opList.add(i, Integer.toString(output));
+                        opList.remove(i - 1);
+                    }
+                }
+            }
+            else if (opList.contains("÷")) {
+                for (int i = 0; i < opList.size(); i++) {
+                    if (opList.get(i).contains("÷")) {
+                        output = Integer.parseInt(opList.get(i - 1)) / Integer.parseInt(opList.get(i + 1));
+                        opList.remove(i + 1);
+                        opList.remove(i);
+                        opList.add(i, Integer.toString(output));
+                        opList.remove(i - 1);
+                    }
+                }
+            }
+            else if (opList.contains("+")) {
+                for (int i = 0; i < opList.size(); i++) {
+                    if (opList.get(i).contains("+")) {
+                        output = Integer.parseInt(opList.get(i - 1)) + Integer.parseInt(opList.get(i + 1));
+                        opList.remove(i + 1);
+                        opList.remove(i);
+                        opList.add(i, Integer.toString(output));
+                        opList.remove(i - 1);
+                        }
+                    }
+                }
+            else if (opList.contains("−")) {
+                for (int i = 0; i < opList.size(); i++) {
+                    if (opList.get(i).contains("−")) {
+                        output = Integer.parseInt(opList.get(i - 1)) - Integer.parseInt(opList.get(i + 1));
+                        opList.remove(i + 1);
+                        opList.remove(i);
+                        opList.add(i, Integer.toString(output));
+                        opList.remove(i - 1);
+                    }
+                }
+            }
+        }
+
+        // update the DEBUG window
+        TextView debugText = (TextView) findViewById(R.id.debug);
+        debugText.setText(opList.toString());
+        // update the output text
+        TextView outputText = (TextView) findViewById(R.id.outputText);
+        outputText.setText(Integer.toString(output));
     }
 
     @Override
