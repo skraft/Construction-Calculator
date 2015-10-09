@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,11 +40,21 @@ public class MainActivity extends Activity {
     // function to receive operation button clicks
     public void clickOperation(View view) {
         // add the current concatenated number to operation list
-        opList.add(numInputString);
-        // add the clicked operator to the operation list
-        Button numberButton = (Button) view;
-        buttonString = numberButton.getText().toString();
-        opList.add(buttonString);
+        if (numInputString != "") {
+            opList.add(numInputString);
+        }
+        // get the button text
+        Button opButton = (Button) view;
+        buttonString = opButton.getText().toString();
+        // don't allow two operators to be entered back to back
+        String lastEntry = opList.get(opList.size() - 1);
+        if (lastEntry.contains("x") || lastEntry.contains("÷") || lastEntry.contains("+") || lastEntry.contains("−")) {
+            opList.remove(opList.size() - 1); // replace the last entry with a new operator
+            opList.add(buttonString);
+        }
+        else {
+            opList.add(buttonString);
+        }
         // update the DEBUG window
         TextView debugText = (TextView) findViewById(R.id.debug);
         debugText.setText(opList.toString());
@@ -67,57 +78,44 @@ public class MainActivity extends Activity {
         outputText.setText("0");
         debugText.setText("");
         // clear variables
-        opList = new ArrayList<>();
+        opList.clear();
         numInputString = "";
     }
 
     public void calcualte() {
         int output = 0;
-
         while (opList.size() > 1) {
             if (opList.contains("x")) {
-                for (int i = 0; i < opList.size(); i++) {
-                    if (opList.get(i).contains("x")) {
-                        output = Integer.parseInt(opList.get(i - 1)) * Integer.parseInt(opList.get(i + 1));
-                        opList.remove(i + 1);
-                        opList.remove(i);
-                        opList.add(i, Integer.toString(output));
-                        opList.remove(i - 1);
-                    }
-                }
+                int i = opList.indexOf("x");
+                output = Integer.parseInt(opList.get(i - 1)) * Integer.parseInt(opList.get(i + 1));
+                opList.remove(i + 1);
+                opList.remove(i);
+                opList.add(i, Integer.toString(output));
+                opList.remove(i - 1);
             }
             else if (opList.contains("÷")) {
-                for (int i = 0; i < opList.size(); i++) {
-                    if (opList.get(i).contains("÷")) {
-                        output = Integer.parseInt(opList.get(i - 1)) / Integer.parseInt(opList.get(i + 1));
-                        opList.remove(i + 1);
-                        opList.remove(i);
-                        opList.add(i, Integer.toString(output));
-                        opList.remove(i - 1);
-                    }
-                }
+                int i = opList.indexOf("÷");
+                output = Integer.parseInt(opList.get(i - 1)) / Integer.parseInt(opList.get(i + 1));
+                opList.remove(i + 1);
+                opList.remove(i);
+                opList.add(i, Integer.toString(output));
+                opList.remove(i - 1);
             }
             else if (opList.contains("+")) {
-                for (int i = 0; i < opList.size(); i++) {
-                    if (opList.get(i).contains("+")) {
-                        output = Integer.parseInt(opList.get(i - 1)) + Integer.parseInt(opList.get(i + 1));
-                        opList.remove(i + 1);
-                        opList.remove(i);
-                        opList.add(i, Integer.toString(output));
-                        opList.remove(i - 1);
-                        }
-                    }
+                int i = opList.indexOf("+");
+                output = Integer.parseInt(opList.get(i - 1)) + Integer.parseInt(opList.get(i + 1));
+                opList.remove(i + 1);
+                opList.remove(i);
+                opList.add(i, Integer.toString(output));
+                opList.remove(i - 1);
                 }
             else if (opList.contains("−")) {
-                for (int i = 0; i < opList.size(); i++) {
-                    if (opList.get(i).contains("−")) {
-                        output = Integer.parseInt(opList.get(i - 1)) - Integer.parseInt(opList.get(i + 1));
-                        opList.remove(i + 1);
-                        opList.remove(i);
-                        opList.add(i, Integer.toString(output));
-                        opList.remove(i - 1);
-                    }
-                }
+                int i = opList.indexOf("−");
+                output = Integer.parseInt(opList.get(i - 1)) - Integer.parseInt(opList.get(i + 1));
+                opList.remove(i + 1);
+                opList.remove(i);
+                opList.add(i, Integer.toString(output));
+                opList.remove(i - 1);
             }
         }
 
