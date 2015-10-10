@@ -20,6 +20,28 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
     ArrayList<String> opList = new ArrayList<>();
     String buttonString = "";
     String numInputString = "";
@@ -46,14 +68,15 @@ public class MainActivity extends Activity {
         // get the button text
         Button opButton = (Button) view;
         buttonString = opButton.getText().toString();
-        // don't allow two operators to be entered back to back
-        String lastEntry = opList.get(opList.size() - 1);
-        if (lastEntry.contains("x") || lastEntry.contains("÷") || lastEntry.contains("+") || lastEntry.contains("−")) {
-            opList.remove(opList.size() - 1); // replace the last entry with a new operator
-            opList.add(buttonString);
-        }
-        else {
-            opList.add(buttonString);
+        if (opList.size() > 0) { // don't add operators if no number has been entered
+            // don't allow two operators to be entered back to back : replace the last operator
+            String lastEntry = opList.get(opList.size() - 1);
+            if (lastEntry.contains("x") || lastEntry.contains("÷") || lastEntry.contains("+") || lastEntry.contains("−")) {
+                opList.remove(opList.size() - 1); // replace the last entry with a new operator
+                opList.add(buttonString);
+            } else {
+                opList.add(buttonString);
+            }
         }
         // update the DEBUG window
         TextView debugText = (TextView) findViewById(R.id.debug);
@@ -64,12 +87,18 @@ public class MainActivity extends Activity {
 
     public void clickCalculate(View view) {
         // add the current concatenated number to operation list
-        opList.add(numInputString);
+        if (numInputString != "") {
+            opList.add(numInputString);
+        }
         // update the DEBUG window
         TextView debugText = (TextView) findViewById(R.id.debug);
         debugText.setText(opList.toString());
+        // check for an invalid opList
+        cleanOpList();
         // start calculate function
         calcualte();
+        // clear the last number input
+        numInputString = "";
     }
 
     public void clear(View view) {
@@ -82,8 +111,19 @@ public class MainActivity extends Activity {
         numInputString = "";
     }
 
+    public void cleanOpList() {
+        String lastEntry = opList.get(opList.size() - 1);
+        // if the last entry is an operator : remove it
+        if (lastEntry.contains("x") || lastEntry.contains("÷") || lastEntry.contains("+") || lastEntry.contains("−")) {
+            opList.remove(opList.size() - 1);
+        }
+    }
+
     public void calcualte() {
         int output = 0;
+        if (opList.size() == 1) {
+            output = Integer.parseInt(opList.get(0)); // set
+        }
         while (opList.size() > 1) {
             if (opList.contains("x")) {
                 int i = opList.indexOf("x");
@@ -125,27 +165,5 @@ public class MainActivity extends Activity {
         // update the output text
         TextView outputText = (TextView) findViewById(R.id.outputText);
         outputText.setText(Integer.toString(output));
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 }
