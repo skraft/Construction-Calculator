@@ -50,6 +50,7 @@
                 android:background="#323232"
                 android:gravity="right"
                 android:paddingRight="10dp" />
+
         </LinearLayout>
         <!--
         <RelativeLayout
@@ -155,6 +156,14 @@
                 android:text="@string/clear"
                 android:id="@+id/button_clear"
                 android:onClick="clear" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/button_backspace"
+                android:src="@drawable/ic_backspace_white_24dp"
+                android:minHeight="48dp" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -162,13 +171,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1">
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="@string/yard"
-                android:id="@+id/button_yards"
-                android:layout_weight="1" />
 
             <Button
                 android:layout_width="match_parent"
@@ -182,6 +184,13 @@
                 android:layout_height="match_parent"
                 android:text="@string/inch"
                 android:id="@+id/button_inch"
+                android:layout_weight="1" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="+/-"
+                android:id="@+id/button_neg"
                 android:layout_weight="1" />
 
             <Button
