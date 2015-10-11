@@ -59,10 +59,34 @@ public class MainActivity extends Activity {
         outputText.setText(numInputString);
     }
 
+    public void clickBackspace(View view) {
+        TextView outputText = (TextView) findViewById(R.id.outputText);
+        // remove the last character in the numInputString
+        if (numInputString.length() > 0) {
+            numInputString = numInputString.substring(0, numInputString.length() - 1);
+        }
+        else {
+            numInputString = "";
+        }
+        outputText.setText(numInputString);
+    }
+
+    public void clickNegative(View view) {
+        TextView outputText = (TextView) findViewById(R.id.outputText);
+        // add a negative if positive, remove the negative if negative
+        if (numInputString.startsWith("-")) {
+            numInputString = numInputString.substring(1, numInputString.length());
+        }
+        else {
+            numInputString = "-" + numInputString;
+        }
+        outputText.setText(numInputString);
+    }
+
     // function to receive operation button clicks
     public void clickOperation(View view) {
         // add the current concatenated number to operation list
-        if (numInputString != "") {
+        if (!numInputString.equals("") && !numInputString.equals("-")) {
             opList.add(numInputString);
         }
         // get the button text
@@ -85,9 +109,10 @@ public class MainActivity extends Activity {
         numInputString = "";
     }
 
+    //TODO typing '0' '=' crashes in an infinite loop
     public void clickCalculate(View view) {
         // add the current concatenated number to operation list
-        if (numInputString != "") {
+        if (!numInputString.equals("")) {
             opList.add(numInputString);
         }
         // update the DEBUG window
@@ -120,41 +145,41 @@ public class MainActivity extends Activity {
     }
 
     public void calcualte() {
-        int output = 0;
+        float output = 0;
         if (opList.size() == 1) {
-            output = Integer.parseInt(opList.get(0)); // set
+            output = Float.parseFloat(opList.get(0)); // set
         }
         while (opList.size() > 1) {
             if (opList.contains("x")) {
                 int i = opList.indexOf("x");
-                output = Integer.parseInt(opList.get(i - 1)) * Integer.parseInt(opList.get(i + 1));
+                output = Float.parseFloat(opList.get(i - 1)) * Float.parseFloat(opList.get(i + 1));
                 opList.remove(i + 1);
                 opList.remove(i);
-                opList.add(i, Integer.toString(output));
+                opList.add(i, Float.toString(output));
                 opList.remove(i - 1);
             }
             else if (opList.contains("÷")) {
                 int i = opList.indexOf("÷");
-                output = Integer.parseInt(opList.get(i - 1)) / Integer.parseInt(opList.get(i + 1));
+                output = Float.parseFloat(opList.get(i - 1)) / Float.parseFloat(opList.get(i + 1));
                 opList.remove(i + 1);
                 opList.remove(i);
-                opList.add(i, Integer.toString(output));
+                opList.add(i, Float.toString(output));
                 opList.remove(i - 1);
             }
             else if (opList.contains("+")) {
                 int i = opList.indexOf("+");
-                output = Integer.parseInt(opList.get(i - 1)) + Integer.parseInt(opList.get(i + 1));
+                output = Float.parseFloat(opList.get(i - 1)) + Float.parseFloat(opList.get(i + 1));
                 opList.remove(i + 1);
                 opList.remove(i);
-                opList.add(i, Integer.toString(output));
+                opList.add(i, Float.toString(output));
                 opList.remove(i - 1);
                 }
             else if (opList.contains("−")) {
                 int i = opList.indexOf("−");
-                output = Integer.parseInt(opList.get(i - 1)) - Integer.parseInt(opList.get(i + 1));
+                output = Float.parseFloat(opList.get(i - 1)) - Float.parseFloat(opList.get(i + 1));
                 opList.remove(i + 1);
                 opList.remove(i);
-                opList.add(i, Integer.toString(output));
+                opList.add(i, Float.toString(output));
                 opList.remove(i - 1);
             }
         }
@@ -164,6 +189,6 @@ public class MainActivity extends Activity {
         debugText.setText(opList.toString());
         // update the output text
         TextView outputText = (TextView) findViewById(R.id.outputText);
-        outputText.setText(Integer.toString(output));
+        outputText.setText(Float.toString(output));
     }
 }
