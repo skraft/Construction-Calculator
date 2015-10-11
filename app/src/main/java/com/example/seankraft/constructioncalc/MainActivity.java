@@ -2,6 +2,7 @@ package com.example.seankraft.constructioncalc;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -110,6 +111,9 @@ public class MainActivity extends Activity {
     }
 
     //TODO typing '0' '=' crashes in an infinite loop
+    //TODO very long numbers crash the app (probably a float resolution problem)\
+    //TODO entering a new number after calculating should clear - right now it creates bad data
+    //TODO oder of operations : multiply / divide  and  add / subtract should run left to right
     public void clickCalculate(View view) {
         // add the current concatenated number to operation list
         if (!numInputString.equals("")) {
@@ -189,6 +193,23 @@ public class MainActivity extends Activity {
         debugText.setText(opList.toString());
         // update the output text
         TextView outputText = (TextView) findViewById(R.id.outputText);
-        outputText.setText(Float.toString(output));
+
+        // remove zero value decimals. Example (4.0 becomes 4)
+        String testString = Float.toString(output);
+        String outputString = "";
+        if (testString.contains(".")) {
+            String[] parts = testString.split(Pattern.quote("."));
+            int floatPart = Integer.parseInt(parts[1]);
+            if (floatPart == 0) {
+                outputString = parts[0];
+            }
+            else {
+                outputString = testString;
+            }
+        }
+        else {
+            outputString = testString;
+        }
+        outputText.setText(outputString);
     }
 }
