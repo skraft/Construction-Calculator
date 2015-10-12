@@ -12,6 +12,8 @@ import android.widget.TextView;
 import android.widget.Button;
 import java.math.*;
 
+//TODO oder of operations : multiply / divide  and  add / subtract should run left to right
+
 public class MainActivity extends Activity {
 
     @Override
@@ -49,14 +51,22 @@ public class MainActivity extends Activity {
     // for rounding to a specific fraction resolution:
     //Math.round(myFloat*16) / 16f
 
-    // function to receive number button clicks
     public void clickNumber(View view) {
         TextView outputText = (TextView) findViewById(R.id.outputText);
+        TextView debugText = (TextView) findViewById(R.id.debug);
         Button numberButton = (Button) view;
         buttonString = numberButton.getText().toString();
         // add the number to the output string for the view
         numInputString = numInputString + buttonString;
         outputText.setText(numInputString);
+        // if the only entry in the opList is another number, clear: (starting a fresh calculation)
+        if (opList.size() == 1) {
+            String entry = opList.get(0);
+            if (!entry.contains("x") && !entry.contains("÷") && !entry.contains("+") && !entry.contains("−")) {
+                opList.clear();
+                debugText.setText("");
+            }
+        }
     }
 
     public void clickBackspace(View view) {
@@ -83,7 +93,6 @@ public class MainActivity extends Activity {
         outputText.setText(numInputString);
     }
 
-    // function to receive operation button clicks
     public void clickOperation(View view) {
         // add the current concatenated number to operation list
         if (!numInputString.equals("") && !numInputString.equals("-")) {
@@ -109,10 +118,6 @@ public class MainActivity extends Activity {
         numInputString = "";
     }
 
-    //TODO typing '0' '=' crashes in an infinite loop
-    //TODO very long numbers crash the app (probably a float resolution problem)\
-    //TODO entering a new number after calculating should clear - right now it creates bad data
-    //TODO oder of operations : multiply / divide  and  add / subtract should run left to right
     public void clickCalculate(View view) {
         // add the current concatenated number to operation list
         if (!numInputString.equals("")) {
