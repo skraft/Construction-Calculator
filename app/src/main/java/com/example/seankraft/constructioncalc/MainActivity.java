@@ -1,9 +1,7 @@
 package com.example.seankraft.constructioncalc;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.regex.Pattern;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Button;
+import java.math.*;
 
 public class MainActivity extends Activity {
 
@@ -149,41 +148,50 @@ public class MainActivity extends Activity {
     }
 
     public void calcualte() {
-        float output = 0;
+        BigDecimal output = new BigDecimal("0");
         if (opList.size() == 1) {
-            output = Float.parseFloat(opList.get(0)); // set
+            output = new BigDecimal(opList.get(0)); // set
         }
+
         while (opList.size() > 1) {
             if (opList.contains("x")) {
                 int i = opList.indexOf("x");
-                output = Float.parseFloat(opList.get(i - 1)) * Float.parseFloat(opList.get(i + 1));
+                BigDecimal val1 = new BigDecimal(opList.get(i - 1));
+                BigDecimal val2 = new BigDecimal(opList.get(i + 1));
+                output = val1.multiply(val2); // do multiply
                 opList.remove(i + 1);
                 opList.remove(i);
-                opList.add(i, Float.toString(output));
+                opList.add(i, output.toString());
                 opList.remove(i - 1);
             }
             else if (opList.contains("÷")) {
                 int i = opList.indexOf("÷");
-                output = Float.parseFloat(opList.get(i - 1)) / Float.parseFloat(opList.get(i + 1));
+                BigDecimal val1 = new BigDecimal(opList.get(i - 1));
+                BigDecimal val2 = new BigDecimal(opList.get(i + 1));
+                output = val1.divide(val2, 9, BigDecimal.ROUND_HALF_UP).stripTrailingZeros(); // do divide
                 opList.remove(i + 1);
                 opList.remove(i);
-                opList.add(i, Float.toString(output));
+                opList.add(i, output.toString());
                 opList.remove(i - 1);
             }
             else if (opList.contains("+")) {
                 int i = opList.indexOf("+");
-                output = Float.parseFloat(opList.get(i - 1)) + Float.parseFloat(opList.get(i + 1));
+                BigDecimal val1 = new BigDecimal(opList.get(i - 1));
+                BigDecimal val2 = new BigDecimal(opList.get(i + 1));
+                output = val1.add(val2); // do add
                 opList.remove(i + 1);
                 opList.remove(i);
-                opList.add(i, Float.toString(output));
+                opList.add(i, output.toString());
                 opList.remove(i - 1);
                 }
             else if (opList.contains("−")) {
                 int i = opList.indexOf("−");
-                output = Float.parseFloat(opList.get(i - 1)) - Float.parseFloat(opList.get(i + 1));
+                BigDecimal val1 = new BigDecimal(opList.get(i - 1));
+                BigDecimal val2 = new BigDecimal(opList.get(i + 1));
+                output = val1.subtract(val2); // do subtract
                 opList.remove(i + 1);
                 opList.remove(i);
-                opList.add(i, Float.toString(output));
+                opList.add(i, output.toString());
                 opList.remove(i - 1);
             }
         }
@@ -195,20 +203,12 @@ public class MainActivity extends Activity {
         TextView outputText = (TextView) findViewById(R.id.outputText);
 
         // remove zero value decimals. Example (4.0 becomes 4)
-        String testString = Float.toString(output);
-        String outputString = "";
-        if (testString.contains(".")) {
-            String[] parts = testString.split(Pattern.quote("."));
-            int floatPart = Integer.parseInt(parts[1]);
-            if (floatPart == 0) {
+        String outputString = output.toString();
+        if (outputString.contains(".")) {
+            String[] parts = outputString.split(Pattern.quote("."));
+            if (new BigDecimal(parts[1]).compareTo(BigDecimal.ZERO) == 0) { // after decimal == 0
                 outputString = parts[0];
             }
-            else {
-                outputString = testString;
-            }
-        }
-        else {
-            outputString = testString;
         }
         outputText.setText(outputString);
     }
