@@ -178,21 +178,24 @@
                 android:layout_height="match_parent"
                 android:text="@string/feet"
                 android:id="@+id/button_feet"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:onClick="clickFeet" />
 
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="@string/inch"
                 android:id="@+id/button_inch"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:onClick="clickInch" />
 
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="∕"
                 android:id="@+id/button_fraction"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:onClick="clickFraction" />
 
             <Button
                 android:layout_width="match_parent"

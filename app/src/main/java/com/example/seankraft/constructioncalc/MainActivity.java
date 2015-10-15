@@ -47,6 +47,24 @@ public class MainActivity extends Activity {
     ArrayList<String> opList = new ArrayList<>();
     String buttonString = "";
     String numInputString = "";
+    String numeratorInput = "";
+    BigDecimal inputNumber = new BigDecimal("0");
+
+    Boolean feetAdded = false;
+    Boolean inchAdded = false;
+    Boolean fractionAdded = false;
+
+    String units = "decimal";
+
+    // If feetAdded and inchAdded units = feetInch
+    // If feetAdded but not inch, units = feet
+    // If inchAdded but not feet, units = inch
+    // If !feetAdded && !inchAdded, units = decimal
+
+    //untyped units are inches by default
+    //'feet' pushed, just multiply current value by 12 and add it to numInputString
+    //'inch' pushed, enter current value
+    //fraction entered, convert to decimal and add to numInputString
 
     // for rounding to a specific fraction resolution:
     //Math.round(myFloat*16) / 16f
@@ -93,11 +111,55 @@ public class MainActivity extends Activity {
         outputText.setText(numInputString);
     }
 
-    public void clickOperation(View view) {
-        // add the current concatenated number to operation list
+    public void clickFeet(View view) {
+        TextView outputText = (TextView) findViewById(R.id.outputText);
+        TextView debugText = (TextView) findViewById(R.id.debug);
         if (!numInputString.equals("") && !numInputString.equals("-")) {
-            opList.add(numInputString);
+            // get current number entry
+            String outText = numInputString + " feet";
+            outputText.setText(outText);
+            feetAdded = true;
+            // multiply input times 12
+            BigDecimal feet = new BigDecimal(numInputString);
+            inputNumber = feet.multiply(new BigDecimal("12")).add(inputNumber);
+            // update debug
+            debugText.setText(inputNumber.toString());
         }
+        numInputString = "";
+    }
+
+    public void clickInch(View view) {
+        TextView outputText = (TextView) findViewById(R.id.outputText);
+        TextView debugText = (TextView) findViewById(R.id.debug);
+        if (!numInputString.equals("") && !numInputString.equals("-")) {
+            // get current number entry
+            String outText = numInputString + " inch";
+            outputText.setText(outText);
+            inchAdded = true;
+            // add input value
+            BigDecimal inch = new BigDecimal(numInputString);
+            inputNumber = inch.add(inputNumber);
+            // update debug
+            debugText.setText(inputNumber.toString());
+        }
+        numInputString = "";
+    }
+
+    public void clickFraction(View view) {
+        TextView outputText = (TextView) findViewById(R.id.outputText);
+        TextView debugText = (TextView) findViewById(R.id.debug);
+        if (!numInputString.equals("") && !numInputString.equals("-")) {
+            fractionAdded = true;
+            // define numerator
+            numeratorInput = numInputString;
+            String outText = numInputString + "/";
+            outputText.setText(outText);
+        }
+        numInputString = "";
+    }
+
+    public void clickOperation(View view) {
+        compile_input_number();
         // get the button text
         Button opButton = (Button) view;
         buttonString = opButton.getText().toString();
@@ -114,22 +176,23 @@ public class MainActivity extends Activity {
         // update the DEBUG window
         TextView debugText = (TextView) findViewById(R.id.debug);
         debugText.setText(opList.toString());
-        // clear the numInputString for the next number entry
+        // clear the variables for the next number entry
         numInputString = "";
+        numeratorInput = "";
+        inputNumber = BigDecimal.ZERO;
+        fractionAdded = false;
     }
 
     public void clickCalculate(View view) {
         // add the current concatenated number to operation list
-        if (!numInputString.equals("")) {
-            opList.add(numInputString);
-        }
+        compile_input_number();
         // update the DEBUG window
         TextView debugText = (TextView) findViewById(R.id.debug);
         debugText.setText(opList.toString());
         // check for an invalid opList
         cleanOpList();
         // start calculate function
-        calcualte();
+        calculate();
         // clear the last number input
         numInputString = "";
     }
@@ -142,6 +205,30 @@ public class MainActivity extends Activity {
         // clear variables
         opList.clear();
         numInputString = "";
+        numeratorInput = "";
+        inputNumber = BigDecimal.ZERO;
+        feetAdded = false;
+        inchAdded = false;
+        fractionAdded = false;
+        units = "decimal";
+    }
+
+    public void compile_input_number() {
+        // This function compiles any feet, inch, and fraction input into the opList
+        if (fractionAdded) {
+            BigDecimal numerator = new BigDecimal(numeratorInput);
+            BigDecimal denominator = new BigDecimal(numInputString);
+            inputNumber = numerator.divide(denominator, 9, BigDecimal.ROUND_HALF_UP).add(inputNumber);
+        }
+        // if there is an inputNumber; add it to the opList
+        if (inputNumber.compareTo(BigDecimal.ZERO) != 0) {
+            opList.add(inputNumber.toString());
+        }
+        else {
+            if (!numInputString.equals("") && !numInputString.equals("-")) {
+                opList.add(numInputString);
+            }
+        }
     }
 
     public void cleanOpList() {
@@ -152,7 +239,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    public void calcualte() {
+    public void calculate() {
         BigDecimal output = new BigDecimal("0");
         if (opList.size() == 1) {
             output = new BigDecimal(opList.get(0)); // set
