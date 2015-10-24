@@ -48,7 +48,8 @@ public class MainActivity extends Activity {
     String buttonString = "";
     String numInputString = "";
     String numeratorInput = "";
-    BigDecimal inputNumber = new BigDecimal("0");
+    BigDecimal inputNumber = new BigDecimal("0");  // for calculating feet / inches
+    BigDecimal output = new BigDecimal("0");  // the output of the calc fuction
 
     Boolean feetAdded = false;
     Boolean inchAdded = false;
@@ -240,7 +241,6 @@ public class MainActivity extends Activity {
     }
 
     public void calculate() {
-        BigDecimal output = new BigDecimal("0");
         if (opList.size() == 1) {
             output = new BigDecimal(opList.get(0)); // set
         }
@@ -287,21 +287,49 @@ public class MainActivity extends Activity {
                 opList.remove(i - 1);
             }
         }
+        display_output();
+    }
 
-        // update the DEBUG window
-        TextView debugText = (TextView) findViewById(R.id.debug);
-        debugText.setText(opList.toString());
-        // update the output text
-        TextView outputText = (TextView) findViewById(R.id.outputText);
-
+    public String remove_trailing_zeros(BigDecimal input) {
         // remove zero value decimals. Example (4.0 becomes 4)
-        String outputString = output.toString();
+        String outputString = input.toString();
         if (outputString.contains(".")) {
             String[] parts = outputString.split(Pattern.quote("."));
             if (new BigDecimal(parts[1]).compareTo(BigDecimal.ZERO) == 0) { // after decimal == 0
                 outputString = parts[0];
             }
         }
-        outputText.setText(outputString);
+        return outputString;
+    }
+
+    public void display_output() {
+        // This function checks the current 'units' value and write the output to the UI
+        // in the appropriate format. It also checks the current fraction resolution and
+        // converts the decimal value to the correct fraction.
+
+        TextView debugText = (TextView) findViewById(R.id.debug);
+        TextView outputText = (TextView) findViewById(R.id.outputText);
+
+        // check what type of data was entered and format the output to match
+        if (feetAdded || inchAdded) {
+            BigDecimal feetInch[] = output.divideAndRemainder(new BigDecimal("12"));
+            String debugString = "";
+            if (feetInch[0].compareTo(BigDecimal.ZERO) != 0) {
+                debugString += remove_trailing_zeros(feetInch[0]);
+                debugString += "'";
+            }
+            if (feetInch[1].compareTo(BigDecimal.ZERO) != 0) {
+                debugString += " " + remove_trailing_zeros(feetInch[1]);
+                debugString += '"';
+            }
+            outputText.setText(debugString);
+            // write inches to debug
+            String outputString = remove_trailing_zeros(output);
+            debugText.setText(outputString);
+        }
+        else {
+            String outputString = remove_trailing_zeros(output);
+            outputText.setText(outputString);
+        }
     }
 }
