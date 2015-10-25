@@ -44,6 +44,9 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    // from settings
+    int fractionRes = 16;
+
     ArrayList<String> opList = new ArrayList<>();
     String buttonString = "";
     String numInputString = "";
@@ -287,7 +290,7 @@ public class MainActivity extends Activity {
                 opList.remove(i - 1);
             }
         }
-        display_output();
+        format_output();
     }
 
     public String remove_trailing_zeros(BigDecimal input) {
@@ -302,30 +305,58 @@ public class MainActivity extends Activity {
         return outputString;
     }
 
-    public void display_output() {
-        // This function checks the current 'units' value and write the output to the UI
+    public String decimal_to_fraction(String decimalString) {
+        // if the decimal part is > 0
+        if (new BigDecimal(decimalString).compareTo(BigDecimal.ZERO) == 1) {  // after decimal > 0
+            BigDecimal numerator = new BigDecimal(decimalString);
+            BigDecimal denominator = new BigDecimal("10").pow(decimalString.length());
+        }
+        else {
+            // TODO return null
+        }
+    }
+
+    public void format_output() {
+        // This function checks the current 'units' value and writes the output to the UI
         // in the appropriate format. It also checks the current fraction resolution and
         // converts the decimal value to the correct fraction.
 
         TextView debugText = (TextView) findViewById(R.id.debug);
         TextView outputText = (TextView) findViewById(R.id.outputText);
 
-        // check what type of data was entered and format the output to match
-        if (feetAdded || inchAdded) {
-            BigDecimal feetInch[] = output.divideAndRemainder(new BigDecimal("12"));
-            String debugString = "";
-            if (feetInch[0].compareTo(BigDecimal.ZERO) != 0) {
-                debugString += remove_trailing_zeros(feetInch[0]);
-                debugString += "'";
+        if (fractionAdded || feetAdded || inchAdded) {
+            BigDecimal integerPart = output;
+            String fractionPart = "";
+
+            // convert decimal to fraction
+            String outputString = output.toString();
+            if (outputString.contains(".")) {
+                String[] parts = outputString.split(Pattern.quote("."));
+                integerPart = new BigDecimal(parts[0]);
+                fractionPart = decimal_to_fraction(parts[1]);
             }
-            if (feetInch[1].compareTo(BigDecimal.ZERO) != 0) {
-                debugString += " " + remove_trailing_zeros(feetInch[1]);
-                debugString += '"';
+
+            // check what type of data was entered and format the output to match
+            if (feetAdded || inchAdded) {
+                BigDecimal feetInch[] = integerPart.divideAndRemainder(new BigDecimal("12"));
+                String debugString = "";
+                if (feetInch[0].compareTo(BigDecimal.ZERO) != 0) {
+                    debugString += remove_trailing_zeros(feetInch[0]);
+                    debugString += "'";
+                }
+                if (feetInch[1].compareTo(BigDecimal.ZERO) != 0) {
+                    debugString += " " + remove_trailing_zeros(feetInch[1]);
+                    debugString += '"';
+                }
+                outputText.setText(debugString);
+
+                // write inches to debug
+                String outputString = remove_trailing_zeros(output);
+                debugText.setText(outputString);
             }
-            outputText.setText(debugString);
-            // write inches to debug
-            String outputString = remove_trailing_zeros(output);
-            debugText.setText(outputString);
+            else {
+                // TODO output integer with fraction : no feet or inches
+            }
         }
         else {
             String outputString = remove_trailing_zeros(output);
