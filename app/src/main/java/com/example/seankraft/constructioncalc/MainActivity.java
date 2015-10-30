@@ -45,7 +45,7 @@ public class MainActivity extends Activity {
     }
 
     // from settings
-    int fractionRes = 16;
+    String fractionRes = "16";
 
     ArrayList<String> opList = new ArrayList<>();
     String buttonString = "";
@@ -308,11 +308,35 @@ public class MainActivity extends Activity {
     public String decimal_to_fraction(String decimalString) {
         // if the decimal part is > 0
         if (new BigDecimal(decimalString).compareTo(BigDecimal.ZERO) == 1) {  // after decimal > 0
+            // create a denominator for the fraction
             BigDecimal numerator = new BigDecimal(decimalString);
             BigDecimal denominator = new BigDecimal("10").pow(decimalString.length());
+
+            // convert to fraction to resolution from settings
+            BigDecimal reducer = denominator.divide(new BigDecimal(fractionRes), 9, BigDecimal.ROUND_HALF_UP);
+            numerator = numerator.divide(reducer, 0, BigDecimal.ROUND_HALF_UP);
+            denominator = new BigDecimal(fractionRes);
+
+            BigDecimal two = new BigDecimal("2");
+            // reduce fraction
+            while (numerator.compareTo(BigDecimal.ONE) == 1 &&
+                    denominator.compareTo(BigDecimal.ONE) == 1) {
+                BigDecimal numRemain = numerator.remainder(two);
+                BigDecimal denRemain = denominator.remainder(two);
+                // if numerator and denominator can be split in half evenly
+                if (numRemain.compareTo(BigDecimal.ZERO) == 0 && denRemain.compareTo(BigDecimal.ZERO) == 0) {
+                    numerator = numerator.divide(two, 0, BigDecimal.ROUND_HALF_UP);
+                    denominator = denominator.divide(two, 0, BigDecimal.ROUND_HALF_UP);
+                }
+                else {
+                    break;
+                }
+            }
+            String outputString = numerator.toString() + "/" + denominator.toString();
+            return outputString;
         }
         else {
-            // TODO return null
+            return "";
         }
     }
 
@@ -334,6 +358,7 @@ public class MainActivity extends Activity {
                 String[] parts = outputString.split(Pattern.quote("."));
                 integerPart = new BigDecimal(parts[0]);
                 fractionPart = decimal_to_fraction(parts[1]);
+                debugText.setText(fractionPart);
             }
 
             // check what type of data was entered and format the output to match
@@ -351,12 +376,12 @@ public class MainActivity extends Activity {
                 outputText.setText(debugString);
 
                 // write inches to debug
-                String outputString = remove_trailing_zeros(output);
-                debugText.setText(outputString);
+                //String outputString = remove_trailing_zeros(output);
+                //debugText.setText(outputString);
             }
-            else {
-                // TODO output integer with fraction : no feet or inches
-            }
+            //else {
+            //    // TODO output integer with fraction : no feet or inches
+            //}
         }
         else {
             String outputString = remove_trailing_zeros(output);
