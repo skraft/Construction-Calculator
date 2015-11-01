@@ -52,11 +52,12 @@ public class MainActivity extends Activity {
     String numInputString = "";
     String numeratorInput = "";
     BigDecimal inputNumber = new BigDecimal("0");  // for calculating feet / inches
-    BigDecimal output = new BigDecimal("0");  // the output of the calc fuction
+    BigDecimal output = new BigDecimal("0");  // the output of the calc function
 
     Boolean feetAdded = false;
     Boolean inchAdded = false;
-    Boolean fractionAdded = false;
+    Boolean fractionAdded = false;  // tracks fraction input until clear or calculate is pushed
+    Boolean addingFraction = false;  // tracks if a fraction is currently being typed
 
     String units = "decimal";
 
@@ -75,7 +76,7 @@ public class MainActivity extends Activity {
 
     public void clickNumber(View view) {
         TextView outputText = (TextView) findViewById(R.id.outputText);
-        TextView debugText = (TextView) findViewById(R.id.debug);
+        TextView debugText = (TextView) findViewById(R.id.oplist);
         Button numberButton = (Button) view;
         buttonString = numberButton.getText().toString();
         // add the number to the output string for the view
@@ -117,7 +118,7 @@ public class MainActivity extends Activity {
 
     public void clickFeet(View view) {
         TextView outputText = (TextView) findViewById(R.id.outputText);
-        TextView debugText = (TextView) findViewById(R.id.debug);
+        TextView debugText = (TextView) findViewById(R.id.oplist);
         if (!numInputString.equals("") && !numInputString.equals("-")) {
             // get current number entry
             String outText = numInputString + " feet";
@@ -134,7 +135,7 @@ public class MainActivity extends Activity {
 
     public void clickInch(View view) {
         TextView outputText = (TextView) findViewById(R.id.outputText);
-        TextView debugText = (TextView) findViewById(R.id.debug);
+        TextView debugText = (TextView) findViewById(R.id.oplist);
         if (!numInputString.equals("") && !numInputString.equals("-")) {
             // get current number entry
             String outText = numInputString + " inch";
@@ -151,9 +152,9 @@ public class MainActivity extends Activity {
 
     public void clickFraction(View view) {
         TextView outputText = (TextView) findViewById(R.id.outputText);
-        TextView debugText = (TextView) findViewById(R.id.debug);
         if (!numInputString.equals("") && !numInputString.equals("-")) {
             fractionAdded = true;
+            addingFraction = true;
             // define numerator
             numeratorInput = numInputString;
             String outText = numInputString + "/";
@@ -178,20 +179,20 @@ public class MainActivity extends Activity {
             }
         }
         // update the DEBUG window
-        TextView debugText = (TextView) findViewById(R.id.debug);
+        TextView debugText = (TextView) findViewById(R.id.oplist);
         debugText.setText(opList.toString());
         // clear the variables for the next number entry
         numInputString = "";
         numeratorInput = "";
         inputNumber = BigDecimal.ZERO;
-        fractionAdded = false;
+        addingFraction = false;
     }
 
     public void clickCalculate(View view) {
         // add the current concatenated number to operation list
         compile_input_number();
         // update the DEBUG window
-        TextView debugText = (TextView) findViewById(R.id.debug);
+        TextView debugText = (TextView) findViewById(R.id.oplist);
         debugText.setText(opList.toString());
         // check for an invalid opList
         cleanOpList();
@@ -199,11 +200,12 @@ public class MainActivity extends Activity {
         calculate();
         // clear the last number input
         numInputString = "";
+        inputNumber = BigDecimal.ZERO;
     }
 
     public void clear(View view) {
         TextView outputText = (TextView) findViewById(R.id.outputText);
-        TextView debugText = (TextView) findViewById(R.id.debug);
+        TextView debugText = (TextView) findViewById(R.id.oplist);
         outputText.setText("0");
         debugText.setText("");
         // clear variables
@@ -214,12 +216,13 @@ public class MainActivity extends Activity {
         feetAdded = false;
         inchAdded = false;
         fractionAdded = false;
+        addingFraction = false;
         units = "decimal";
     }
 
     public void compile_input_number() {
         // This function compiles any feet, inch, and fraction input into the opList
-        if (fractionAdded) {
+        if (addingFraction) {
             BigDecimal numerator = new BigDecimal(numeratorInput);
             BigDecimal denominator = new BigDecimal(numInputString);
             inputNumber = numerator.divide(denominator, 9, BigDecimal.ROUND_HALF_UP).add(inputNumber);
@@ -290,6 +293,7 @@ public class MainActivity extends Activity {
                 opList.remove(i - 1);
             }
         }
+        addingFraction = false;  // hitting "=" concludes fraction entry
         format_output();
     }
 
@@ -332,8 +336,14 @@ public class MainActivity extends Activity {
                     break;
                 }
             }
-            String outputString = numerator.toString() + "/" + denominator.toString();
-            return outputString;
+            // only return a fraction if the numerator is greater then 0
+            if (numerator.compareTo(BigDecimal.ZERO) == 1) {
+                String outputString = numerator.toString() + "/" + denominator.toString();
+                return outputString;
+            }
+            else {
+                return null;
+            }
         }
         else {
             return "";
@@ -345,8 +355,9 @@ public class MainActivity extends Activity {
         // in the appropriate format. It also checks the current fraction resolution and
         // converts the decimal value to the correct fraction.
 
-        TextView debugText = (TextView) findViewById(R.id.debug);
+        TextView debugText = (TextView) findViewById(R.id.oplist);
         TextView outputText = (TextView) findViewById(R.id.outputText);
+        debugText.setText(output.toString());
 
         if (fractionAdded || feetAdded || inchAdded) {
             BigDecimal integerPart = output;
@@ -358,32 +369,40 @@ public class MainActivity extends Activity {
                 String[] parts = outputString.split(Pattern.quote("."));
                 integerPart = new BigDecimal(parts[0]);
                 fractionPart = decimal_to_fraction(parts[1]);
-                debugText.setText(fractionPart);
             }
 
             // check what type of data was entered and format the output to match
             if (feetAdded || inchAdded) {
                 BigDecimal feetInch[] = integerPart.divideAndRemainder(new BigDecimal("12"));
-                String debugString = "";
+                String feetInchOutput = "";
+                // add feet
                 if (feetInch[0].compareTo(BigDecimal.ZERO) != 0) {
-                    debugString += remove_trailing_zeros(feetInch[0]);
-                    debugString += "'";
+                    feetInchOutput += remove_trailing_zeros(feetInch[0]);
+                    feetInchOutput += "'";
                 }
+                // add inches
                 if (feetInch[1].compareTo(BigDecimal.ZERO) != 0) {
-                    debugString += " " + remove_trailing_zeros(feetInch[1]);
-                    debugString += '"';
+                    feetInchOutput += " " + remove_trailing_zeros(feetInch[1]);
+                    feetInchOutput += '"';
                 }
-                outputText.setText(debugString);
-
-                // write inches to debug
-                //String outputString = remove_trailing_zeros(output);
-                //debugText.setText(outputString);
+                // add fractions
+                if (fractionPart != null) {
+                    feetInchOutput += fractionPart;
+                }
+                outputText.setText(feetInchOutput);
             }
-            //else {
-            //    // TODO output integer with fraction : no feet or inches
-            //}
+            else {
+                // output integer with fraction : no feet or inches
+                String fractionOutput = "";
+                fractionOutput += integerPart.toString();
+                if (fractionPart != null) {
+                    fractionOutput += " " + fractionPart;
+                }
+                outputText.setText(fractionOutput);
+            }
         }
         else {
+            // output decimal number : no feet, inches, or fractions
             String outputString = remove_trailing_zeros(output);
             outputText.setText(outputString);
         }
