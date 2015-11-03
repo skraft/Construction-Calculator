@@ -121,7 +121,7 @@ public class MainActivity extends Activity {
         TextView debugText = (TextView) findViewById(R.id.oplist);
         if (!numInputString.equals("") && !numInputString.equals("-")) {
             // get current number entry
-            String outText = numInputString + " feet";
+            String outText = numInputString + "' ";
             outputText.setText(outText);
             feetAdded = true;
             // multiply input times 12
@@ -138,7 +138,7 @@ public class MainActivity extends Activity {
         TextView debugText = (TextView) findViewById(R.id.oplist);
         if (!numInputString.equals("") && !numInputString.equals("-")) {
             // get current number entry
-            String outText = numInputString + " inch";
+            String outText = numInputString + '"';
             outputText.setText(outText);
             inchAdded = true;
             // add input value
@@ -394,7 +394,9 @@ public class MainActivity extends Activity {
             else {
                 // output integer with fraction : no feet or inches
                 String fractionOutput = "";
-                fractionOutput += integerPart.toString();
+                if (integerPart.compareTo(BigDecimal.ZERO) != 0) {
+                    fractionOutput += integerPart.toString();
+                }
                 if (fractionPart != null) {
                     fractionOutput += " " + fractionPart;
                 }
