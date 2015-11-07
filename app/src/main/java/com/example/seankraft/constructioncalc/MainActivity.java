@@ -3,6 +3,9 @@ package com.example.seankraft.constructioncalc;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -20,6 +23,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+//        Button convertButton = (Button) findViewById(R.id.button_convert);
+//        convertButton.setOnClickListener(this);
     }
 
     @Override
@@ -43,6 +48,22 @@ public class MainActivity extends Activity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    /*
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.convert_title)
+                .setItems(R.array.convert_list, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // The 'which' argument contains the index position
+                        // of the selected item
+                    }
+                });
+        return builder.create();
+    }
+    */
+
 
     // from settings
     String fractionRes = "16";
@@ -73,6 +94,29 @@ public class MainActivity extends Activity {
 
     // for rounding to a specific fraction resolution:
     //Math.round(myFloat*16) / 16f
+
+    final String[] items = {
+            R.string.convert_feet,
+            R.string.convert_inch,
+            R.string.convert_feetinch,
+            R.string.convert_fraction,
+            R.string.convert_decimal
+    };
+
+    public void clickConvert(View view) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.convert_title);
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                // Do something with the selection
+                TextView debugText = (TextView) findViewById(R.id.oplist);
+                String tempText = items[which];
+                debugText.setText(tempText);
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
 
     public void clickNumber(View view) {
         TextView outputText = (TextView) findViewById(R.id.outputText);
