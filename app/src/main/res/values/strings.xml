@@ -13,4 +13,12 @@
     <string name="convert_feetinch">Feet and Inches</string>
     <string name="convert_fraction">Fraction</string>
     <string name="convert_decimal">Decimal</string>
+
+    <string-array name="convert_types">
+        <item>Feet Only</item>
+        <item>Inches Only</item>
+        <item>Feet and Inches</item>
+        <item>Fraction</item>
+        <item>Decimal</item>
+    </string-array>
 </resources>

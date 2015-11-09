@@ -3,7 +3,6 @@ package com.example.seankraft.constructioncalc;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -23,8 +22,6 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        Button convertButton = (Button) findViewById(R.id.button_convert);
-//        convertButton.setOnClickListener(this);
     }
 
     @Override
@@ -49,21 +46,6 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    /*
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.convert_title)
-                .setItems(R.array.convert_list, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // The 'which' argument contains the index position
-                        // of the selected item
-                    }
-                });
-        return builder.create();
-    }
-    */
-
 
     // from settings
     String fractionRes = "16";
@@ -82,35 +64,16 @@ public class MainActivity extends Activity {
 
     String units = "decimal";
 
-    // If feetAdded and inchAdded units = feetInch
-    // If feetAdded but not inch, units = feet
-    // If inchAdded but not feet, units = inch
-    // If !feetAdded && !inchAdded, units = decimal
-
-    //untyped units are inches by default
-    //'feet' pushed, just multiply current value by 12 and add it to numInputString
-    //'inch' pushed, enter current value
-    //fraction entered, convert to decimal and add to numInputString
-
-    // for rounding to a specific fraction resolution:
-    //Math.round(myFloat*16) / 16f
-
-    final String[] items = {
-            R.string.convert_feet,
-            R.string.convert_inch,
-            R.string.convert_feetinch,
-            R.string.convert_fraction,
-            R.string.convert_decimal
-    };
-
     public void clickConvert(View view) {
+        final String[] convert_items = getResources().getStringArray(R.array.convert_types);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.convert_title);
-        builder.setItems(items, new DialogInterface.OnClickListener() {
+        builder.setItems(convert_items, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 // Do something with the selection
                 TextView debugText = (TextView) findViewById(R.id.oplist);
-                String tempText = items[which];
+                String tempText = convert_items[which];
+                tempText = tempText + " " + Integer.toString(which);
                 debugText.setText(tempText);
             }
         });
@@ -338,7 +301,8 @@ public class MainActivity extends Activity {
             }
         }
         addingFraction = false;  // hitting "=" concludes fraction entry
-        format_output();
+        int formatMode = -1;
+        format_output(formatMode);
     }
 
     public String remove_trailing_zeros(BigDecimal input) {
@@ -394,7 +358,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    public void format_output() {
+    public void format_output(int formatMode) {
         // This function checks the current 'units' value and writes the output to the UI
         // in the appropriate format. It also checks the current fraction resolution and
         // converts the decimal value to the correct fraction.
