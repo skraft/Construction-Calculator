@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -40,6 +41,8 @@ public class MainActivity extends Activity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
             return true;
         }
 
@@ -66,15 +69,16 @@ public class MainActivity extends Activity {
 
     public void clickConvert(View view) {
         final String[] convert_items = getResources().getStringArray(R.array.convert_types);
+        // check for input in progress and run calculate function if necessary
+//        if (numInputString != null) {
+//            clickCalculate(view);
+//        }
+        // create pop up dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.convert_title);
         builder.setItems(convert_items, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                // Do something with the selection
-                TextView debugText = (TextView) findViewById(R.id.oplist);
-                String tempText = convert_items[which];
-                tempText = tempText + " " + Integer.toString(which);
-                debugText.setText(tempText);
+                format_output(which);
             }
         });
         AlertDialog alert = builder.create();
@@ -205,7 +209,11 @@ public class MainActivity extends Activity {
         cleanOpList();
         // start calculate function
         calculate();
+        // format the output
+        int formatMode = -1;  // -1 means no predetermined format
+        format_output(formatMode);
         // clear the last number input
+        addingFraction = false;  // hitting "=" concludes fraction entry
         numInputString = "";
         inputNumber = BigDecimal.ZERO;
     }
@@ -220,6 +228,7 @@ public class MainActivity extends Activity {
         numInputString = "";
         numeratorInput = "";
         inputNumber = BigDecimal.ZERO;
+        output = BigDecimal.ZERO;
         feetAdded = false;
         inchAdded = false;
         fractionAdded = false;
@@ -300,9 +309,6 @@ public class MainActivity extends Activity {
                 opList.remove(i - 1);
             }
         }
-        addingFraction = false;  // hitting "=" concludes fraction entry
-        int formatMode = -1;
-        format_output(formatMode);
     }
 
     public String remove_trailing_zeros(BigDecimal input) {
@@ -363,58 +369,114 @@ public class MainActivity extends Activity {
         // in the appropriate format. It also checks the current fraction resolution and
         // converts the decimal value to the correct fraction.
 
-        TextView debugText = (TextView) findViewById(R.id.oplist);
         TextView outputText = (TextView) findViewById(R.id.outputText);
-        debugText.setText(output.toString());
 
-        if (fractionAdded || feetAdded || inchAdded) {
-            BigDecimal integerPart = output;
-            String fractionPart = "";
+        // if no format mode is defined, check units to determine format mode
+        if (formatMode == -1) {
+            if (fractionAdded || feetAdded || inchAdded) {
+                if (feetAdded || inchAdded) {
+                    formatMode = 0;  // feet and inches mode
+                }
+                else {
+                    formatMode = 3;  // fraction mode
+                }
+            }
+            else {
+                formatMode = 4;  // decimal mode
+            }
+        }
 
-            // convert decimal to fraction
-            String outputString = output.toString();
-            if (outputString.contains(".")) {
-                String[] parts = outputString.split(Pattern.quote("."));
+        BigDecimal integerPart = output;
+        String fractionPart = "";
+
+        // if there is a decimal point, break the output into parts
+        String outputString = output.toString();
+        if (outputString.contains(".")) {
+            String[] parts = outputString.split(Pattern.quote("."));
+            integerPart = new BigDecimal(parts[0]);
+            fractionPart = decimal_to_fraction(parts[1]);
+        }
+
+        // feet and inches mode
+        if (formatMode == 0) {
+            BigDecimal feetInch[] = integerPart.divideAndRemainder(new BigDecimal("12"));
+            String feetInchOutput = "";
+            // add feet
+            if (feetInch[0].compareTo(BigDecimal.ZERO) != 0) {
+                feetInchOutput += remove_trailing_zeros(feetInch[0]);
+                feetInchOutput += "'";
+            }
+            // add inches
+            if (feetInch[1].compareTo(BigDecimal.ZERO) != 0) {
+                feetInchOutput += " " + remove_trailing_zeros(feetInch[1]);
+                // add inch symbol here if there is no fraction
+                if (fractionPart == null) {
+                    feetInchOutput += '"';
+                }
+            }
+            // add fractions
+            if (fractionPart != null) {
+                feetInchOutput += " ";
+                feetInchOutput += fractionPart;
+                feetInchOutput += '"';
+            }
+            outputText.setText(feetInchOutput);
+        }
+
+        // only feet mode
+        else if (formatMode == 1) {
+            String feetOutput = "";
+            BigDecimal feet = output.divide(new BigDecimal("12"), 9, BigDecimal.ROUND_HALF_UP);
+            // if there is a decimal point, break the output into parts
+            String partsString = feet.toString();
+            if (partsString.contains(".")) {
+                String[] parts = partsString.split(Pattern.quote("."));
                 integerPart = new BigDecimal(parts[0]);
                 fractionPart = decimal_to_fraction(parts[1]);
             }
-
-            // check what type of data was entered and format the output to match
-            if (feetAdded || inchAdded) {
-                BigDecimal feetInch[] = integerPart.divideAndRemainder(new BigDecimal("12"));
-                String feetInchOutput = "";
-                // add feet
-                if (feetInch[0].compareTo(BigDecimal.ZERO) != 0) {
-                    feetInchOutput += remove_trailing_zeros(feetInch[0]);
-                    feetInchOutput += "'";
-                }
-                // add inches
-                if (feetInch[1].compareTo(BigDecimal.ZERO) != 0) {
-                    feetInchOutput += " " + remove_trailing_zeros(feetInch[1]);
-                    feetInchOutput += '"';
-                }
-                // add fractions
-                if (fractionPart != null) {
-                    feetInchOutput += fractionPart;
-                }
-                outputText.setText(feetInchOutput);
+            // add feet
+            feetOutput = integerPart.toString();
+            if (fractionPart == null) {
+                feetOutput = feetOutput + "'";
             }
             else {
-                // output integer with fraction : no feet or inches
-                String fractionOutput = "";
-                if (integerPart.compareTo(BigDecimal.ZERO) != 0) {
-                    fractionOutput += integerPart.toString();
-                }
-                if (fractionPart != null) {
-                    fractionOutput += " " + fractionPart;
-                }
-                outputText.setText(fractionOutput);
+                feetOutput = feetOutput + " " + fractionPart + "'";
             }
+            outputText.setText(feetOutput);
         }
-        else {
-            // output decimal number : no feet, inches, or fractions
-            String outputString = remove_trailing_zeros(output);
-            outputText.setText(outputString);
+
+        // only inch mode
+        else if (formatMode == 2) {
+            String inchOutput = "";
+            // add inches
+            if (integerPart.compareTo(BigDecimal.ZERO) != 0) {
+                inchOutput += remove_trailing_zeros(integerPart);
+            }
+            // add fraction
+            if (fractionPart != null) {
+                inchOutput += " ";
+                inchOutput += fractionPart;
+            }
+            inchOutput += '"';
+            outputText.setText(inchOutput);
+        }
+
+        // fraction mode
+        else if (formatMode == 3) {
+            String fractionOutput = "";
+            if (integerPart.compareTo(BigDecimal.ZERO) != 0) {
+                fractionOutput += integerPart.toString();
+            }
+            if (fractionPart != null) {
+                fractionOutput += " " + fractionPart;
+            }
+            outputText.setText(fractionOutput);
+        }
+
+        // decimal mode
+        else if (formatMode == 4) {
+            String cleanedOutput = remove_trailing_zeros(output);
+            outputText.setText(cleanedOutput);
         }
     }
 }

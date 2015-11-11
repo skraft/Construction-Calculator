@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:key="pref_fraction_res"
+        android:title="@string/pref_resolution"
+        android:summary="@string/pref_resolution_summ"
+        android:dialogTitle="@string/pref_resolution"
+        android:entries="@array/pref_resolution_array"
+        android:entryValues="@array/pref_resolution_array"
+        android:defaultValue="@string/pref_resolution_default" />
+    <CheckBoxPreference
+        android:key="pref_feet_display"
+        android:title="@string/pref_feet_display"
+        android:summary="@string/pref_feet_display_summ"
+        android:defaultValue="true" />
+</PreferenceScreen>
