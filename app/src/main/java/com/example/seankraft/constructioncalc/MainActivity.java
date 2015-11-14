@@ -6,7 +6,9 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -49,9 +51,6 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-
-    // from settings
-    String fractionRes = "16";
 
     ArrayList<String> opList = new ArrayList<>();
     String buttonString = "";
@@ -278,6 +277,7 @@ public class MainActivity extends Activity {
                 opList.add(i, output.toString());
                 opList.remove(i - 1);
             }
+            // TODO handle divide by zero errors
             else if (opList.contains("÷")) {
                 int i = opList.indexOf("÷");
                 BigDecimal val1 = new BigDecimal(opList.get(i - 1));
@@ -312,6 +312,7 @@ public class MainActivity extends Activity {
     }
 
     public String remove_trailing_zeros(BigDecimal input) {
+        // TODO remove some trailing zeros (4.12030900000 becomes 4.120309)
         // remove zero value decimals. Example (4.0 becomes 4)
         String outputString = input.toString();
         if (outputString.contains(".")) {
@@ -329,6 +330,10 @@ public class MainActivity extends Activity {
             // create a denominator for the fraction
             BigDecimal numerator = new BigDecimal(decimalString);
             BigDecimal denominator = new BigDecimal("10").pow(decimalString.length());
+
+            // find the fraction resolution from the app preferences
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+            String fractionRes = sharedPref.getString("pref_fraction_res", "");
 
             // convert to fraction to resolution from settings
             BigDecimal reducer = denominator.divide(new BigDecimal(fractionRes), 9, BigDecimal.ROUND_HALF_UP);
@@ -425,24 +430,35 @@ public class MainActivity extends Activity {
 
         // only feet mode
         else if (formatMode == 1) {
+            // find the decimal vs fraction boolean from the app preferences
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+            boolean feetFractions = sharedPref.getBoolean("pref_feet_display", true);
+
             String feetOutput = "";
             BigDecimal feet = output.divide(new BigDecimal("12"), 9, BigDecimal.ROUND_HALF_UP);
             // if there is a decimal point, break the output into parts
-            String partsString = feet.toString();
-            if (partsString.contains(".")) {
-                String[] parts = partsString.split(Pattern.quote("."));
-                integerPart = new BigDecimal(parts[0]);
-                fractionPart = decimal_to_fraction(parts[1]);
-            }
-            // add feet
-            feetOutput = integerPart.toString();
-            if (fractionPart == null) {
-                feetOutput = feetOutput + "'";
+            if (feetFractions) {
+                String partsString = feet.toString();
+                if (partsString.contains(".")) {
+                    String[] parts = partsString.split(Pattern.quote("."));
+                    integerPart = new BigDecimal(parts[0]);
+                    fractionPart = decimal_to_fraction(parts[1]);
+                }
+                // add feet
+                feetOutput = integerPart.toString();
+                if (fractionPart == null) {
+                    feetOutput = feetOutput + "'";
+                }
+                else {
+                    feetOutput = feetOutput + " " + fractionPart + "'";
+                }
+                outputText.setText(feetOutput);
             }
             else {
-                feetOutput = feetOutput + " " + fractionPart + "'";
+                String feetOutput = remove_trailing_zeros(feet);
+                feetOutput = feetOutput + "'";
+                outputText.setText(feetOutput);
             }
-            outputText.setText(feetOutput);
         }
 
         // only inch mode
