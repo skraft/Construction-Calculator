@@ -333,7 +333,7 @@ public class MainActivity extends Activity {
 
             // find the fraction resolution from the app preferences
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-            String fractionRes = sharedPref.getString("pref_fraction_res", "");
+            String fractionRes = sharedPref.getString("pref_fraction_res", "16");
 
             // convert to fraction to resolution from settings
             BigDecimal reducer = denominator.divide(new BigDecimal(fractionRes), 9, BigDecimal.ROUND_HALF_UP);
@@ -441,11 +441,13 @@ public class MainActivity extends Activity {
                 String partsString = feet.toString();
                 if (partsString.contains(".")) {
                     String[] parts = partsString.split(Pattern.quote("."));
-                    integerPart = new BigDecimal(parts[0]);
+                    feetOutput = parts[0];
                     fractionPart = decimal_to_fraction(parts[1]);
                 }
+                else {
+                    feetOutput = feet.toString();
+                }
                 // add feet
-                feetOutput = integerPart.toString();
                 if (fractionPart == null) {
                     feetOutput = feetOutput + "'";
                 }
@@ -455,7 +457,7 @@ public class MainActivity extends Activity {
                 outputText.setText(feetOutput);
             }
             else {
-                String feetOutput = remove_trailing_zeros(feet);
+                feetOutput = remove_trailing_zeros(feet);
                 feetOutput = feetOutput + "'";
                 outputText.setText(feetOutput);
             }
