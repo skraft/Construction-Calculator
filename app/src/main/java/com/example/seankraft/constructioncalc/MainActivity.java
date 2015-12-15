@@ -66,6 +66,15 @@ public class MainActivity extends Activity {
 
     String units = "decimal";
 
+    public void clickSave(View view) {
+        String empty = "null";
+    }
+
+    public void clickLoad(View view) {
+        Intent intent = new Intent(this, MemoryActivity.class);
+        startActivity(intent);
+    }
+
     public void clickConvert(View view) {
         final String[] convert_items = getResources().getStringArray(R.array.convert_types);
         // check for input in progress and run calculate function if necessary

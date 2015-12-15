@@ -134,8 +134,16 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/memory"
-                android:id="@+id/button_memory" />
+                android:text="@string/save"
+                android:id="@+id/button_save"
+                android:onClick="clickSave" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/load"
+                android:id="@+id/button_load"
+                android:onClick="clickLoad" />
 
             <Space
                 android:layout_width="wrap_content"
