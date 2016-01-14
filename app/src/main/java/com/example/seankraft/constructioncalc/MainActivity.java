@@ -15,6 +15,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Button;
+import android.widget.Toast;
+
 import java.math.*;
 
 //TODO oder of operations : multiply / divide  and  add / subtract should run left to right
@@ -22,9 +24,43 @@ import java.math.*;
 public class MainActivity extends Activity {
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //outState.putString("message", "This is my message to be reloaded");
+        outState.putStringArrayList("opList", opList);
+        outState.putString("output", output.toString());
+        outState.putBoolean("feetAdded", feetAdded);
+        outState.putBoolean("inchAdded", inchAdded);
+        outState.putBoolean("fractionAdded", fractionAdded);
+        outState.putBoolean("addingFraction", addingFraction);
+        outState.putString("units", units);
+
+        TextView outputText = (TextView) findViewById(R.id.outputText);
+        outState.putString("uiOutputText", outputText.getText().toString());
+        TextView debugText = (TextView) findViewById(R.id.oplist);
+        outState.putString("uiDebugText", debugText.getText().toString());
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (savedInstanceState != null) {
+            // the application is being reloaded
+//            Toast.makeText(this, savedInstanceState.getString("uiOutputText"), Toast.LENGTH_LONG).show();
+            opList = savedInstanceState.getStringArrayList("opList");
+            output = new BigDecimal(savedInstanceState.getString("output"));
+            feetAdded = savedInstanceState.getBoolean("feetAdded");
+            inchAdded = savedInstanceState.getBoolean("inchAdded");
+            fractionAdded = savedInstanceState.getBoolean("fractionAdded");
+            addingFraction = savedInstanceState.getBoolean("addingFraction");
+            units = savedInstanceState.getString("units");
+            TextView outputText = (TextView) findViewById(R.id.outputText);
+            outputText.setText(savedInstanceState.getString("uiOutputText"));
+            TextView debugText = (TextView) findViewById(R.id.oplist);
+            debugText.setText(savedInstanceState.getString("uiDebugText"));
+        }
     }
 
     @Override
@@ -65,6 +101,10 @@ public class MainActivity extends Activity {
     Boolean addingFraction = false;  // tracks if a fraction is currently being typed
 
     String units = "decimal";
+
+    public void restoreState(View view) {
+
+    }
 
     public void clickSave(View view) {
         String empty = "null";
