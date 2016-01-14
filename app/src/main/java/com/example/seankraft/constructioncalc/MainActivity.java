@@ -26,15 +26,18 @@ public class MainActivity extends Activity {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        //outState.putString("message", "This is my message to be reloaded");
+        // store all values
         outState.putStringArrayList("opList", opList);
+        outState.putString("buttonString", buttonString);
+        outState.putString("numInputString", numInputString);
+        outState.putString("numeratorInput", numeratorInput);
+        outState.putString("inputNumber", inputNumber.toString());
         outState.putString("output", output.toString());
         outState.putBoolean("feetAdded", feetAdded);
         outState.putBoolean("inchAdded", inchAdded);
         outState.putBoolean("fractionAdded", fractionAdded);
         outState.putBoolean("addingFraction", addingFraction);
         outState.putString("units", units);
-
         TextView outputText = (TextView) findViewById(R.id.outputText);
         outState.putString("uiOutputText", outputText.getText().toString());
         TextView debugText = (TextView) findViewById(R.id.oplist);
@@ -48,8 +51,12 @@ public class MainActivity extends Activity {
 
         if (savedInstanceState != null) {
             // the application is being reloaded
-//            Toast.makeText(this, savedInstanceState.getString("uiOutputText"), Toast.LENGTH_LONG).show();
+            // Toast.makeText(this, savedInstanceState.getString("uiOutputText"), Toast.LENGTH_LONG).show();
             opList = savedInstanceState.getStringArrayList("opList");
+            buttonString = savedInstanceState.getString("buttonString");
+            numInputString = savedInstanceState.getString("numInputString");
+            numeratorInput = savedInstanceState.getString("numeratorInput");
+            inputNumber = new BigDecimal(savedInstanceState.getString("inputNumber"));
             output = new BigDecimal(savedInstanceState.getString("output"));
             feetAdded = savedInstanceState.getBoolean("feetAdded");
             inchAdded = savedInstanceState.getBoolean("inchAdded");
@@ -101,10 +108,6 @@ public class MainActivity extends Activity {
     Boolean addingFraction = false;  // tracks if a fraction is currently being typed
 
     String units = "decimal";
-
-    public void restoreState(View view) {
-
-    }
 
     public void clickSave(View view) {
         String empty = "null";
