@@ -282,19 +282,11 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1">
 
-                    <Button
+                    <Space
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/save"
-                        android:id="@+id/button_save"
-                        android:onClick="clickSave" />
-
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/load"
-                        android:id="@+id/button_load"
-                        android:onClick="clickLoad" />
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:id="@+id/opsSpacer" />
 
                     <Button
                         android:layout_width="wrap_content"
@@ -309,7 +301,7 @@
                         android:text="@string/clear"
                         android:id="@+id/button_clear"
                         android:onClick="clear"
-                        android:minWidth="140dp" />
+                        android:minWidth="80dp" />
 
                 </LinearLayout>
 

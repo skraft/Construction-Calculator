@@ -24,8 +24,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.seankraft.constructioncalc.MainActivity" />
         </activity>
-        <activity android:name=".MemoryActivity" >
-        </activity>
     </application>
 
 </manifest>
