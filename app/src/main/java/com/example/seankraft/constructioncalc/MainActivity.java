@@ -4,19 +4,21 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.Toast;
-
 import java.math.*;
 
 //TODO oder of operations : multiply / divide  and  add / subtract should run left to right
@@ -110,7 +112,44 @@ public class MainActivity extends Activity {
     String units = "decimal";
 
     public void clickSave(View view) {
-        String empty = "null";
+        // get value
+        TextView outputText = (TextView) findViewById(R.id.outputText);
+        String uiOutputString = outputText.getText().toString();
+        String outputString = output.toString();
+
+        if (outputString != null && outputString != "0") {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(uiOutputString);
+
+            // Set up the input
+            final EditText nameInput = new EditText(this);
+
+            // Specify the type of input expected
+            nameInput.setInputType(InputType.TYPE_CLASS_TEXT);
+            nameInput.setHint("save as");
+            builder.setView(nameInput);
+
+            // Set up the buttons
+            builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putStringSet("saved_results", )
+
+                    String saveAsName = nameInput.getText().toString();
+
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+
+            builder.show();
+        }
     }
 
     public void clickLoad(View view) {
