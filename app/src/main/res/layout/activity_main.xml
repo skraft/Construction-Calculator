@@ -50,80 +50,51 @@
                 android:gravity="right"
                 android:paddingRight="10dp" />
 
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="0">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="#323232"
+                    android:textSize="25dp"
+                    android:text="3"
+                    android:id="@+id/textView" />
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="_"
+                    android:layout_weight="1"
+                    android:background="#323232"
+                    android:textSize="25dp"
+                    android:id="@+id/textView4" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="#323232"
+                    android:textSize="25dp"
+                    android:text="4"
+                    android:id="@+id/textView2" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text='"'
+                android:id="@+id/textView3"
+                android:textSize="50dp"
+                android:layout_weight="0"
+                android:background="#323232" />
+
         </LinearLayout>
-        <!--
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="#2f2f2f"
-            android:paddingRight="5dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="14"
-                android:id="@+id/numInches"
-                android:layout_alignParentTop="false"
-                android:layout_alignParentRight="false"
-                android:textSize="50dp"
-                android:layout_toLeftOf="@+id/numFraction"
-                android:paddingLeft="15dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="1/2"
-                android:id="@+id/numFraction"
-                android:layout_alignParentTop="false"
-                android:layout_alignParentBottom="false"
-                android:layout_alignParentRight="false"
-                android:textSize="25dp"
-                android:gravity="top"
-                android:layout_toLeftOf="@+id/txtInches" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="3"
-                android:id="@+id/numFeet"
-                android:textSize="50dp"
-                android:layout_alignParentTop="false"
-                android:layout_alignParentRight="false"
-                android:layout_toLeftOf="@+id/txtFeet" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="in"
-                android:id="@+id/txtInches"
-                android:textSize="20dp"
-                android:layout_alignParentLeft="false"
-                android:layout_alignParentStart="false"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentBottom="false"
-                android:layout_alignParentTop="false"
-                android:layout_alignParentEnd="false"
-                android:layout_alignBottom="@+id/numInches" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="ft"
-                android:id="@+id/txtFeet"
-                android:textSize="20dp"
-                android:layout_alignParentLeft="false"
-                android:layout_alignParentStart="false"
-                android:layout_alignParentRight="false"
-                android:layout_toLeftOf="@+id/numInches"
-                android:layout_alignBottom="@+id/numFeet" />
-
-        </RelativeLayout>
-        -->
 
         <LinearLayout
             android:orientation="horizontal"
