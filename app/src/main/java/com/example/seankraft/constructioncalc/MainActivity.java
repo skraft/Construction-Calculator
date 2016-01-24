@@ -278,6 +278,10 @@ public class MainActivity extends Activity {
         units = "decimal";
     }
 
+    public void update_text_fields(View view) {
+        String null = "null";
+    }
+
     public void compile_input_number() {
         // This function compiles any feet, inch, and fraction input into the opList
         if (addingFraction) {
@@ -367,7 +371,7 @@ public class MainActivity extends Activity {
         return outputString;
     }
 
-    public String decimal_to_fraction(String decimalString) {
+    public String[] decimal_to_fraction(String decimalString) {
         // if the decimal part is > 0
         if (new BigDecimal(decimalString).compareTo(BigDecimal.ZERO) == 1) {  // after decimal > 0
             // create a denominator for the fraction
@@ -400,7 +404,7 @@ public class MainActivity extends Activity {
             }
             // only return a fraction if the numerator is greater then 0
             if (numerator.compareTo(BigDecimal.ZERO) == 1) {
-                String outputString = numerator.toString() + "/" + denominator.toString();
+                String[] outputString = {numerator.toString(), denominator.toString()};
                 return outputString;
             }
             else {
@@ -408,7 +412,7 @@ public class MainActivity extends Activity {
             }
         }
         else {
-            return "";
+            return null;
         }
     }
 
@@ -452,8 +456,13 @@ public class MainActivity extends Activity {
     }
 
     public void format_feet_and_inch(TextView outputText) {
+        TextView fractionNum = (TextView) findViewById(R.id.outputNumerator);
+        TextView fractionDem = (TextView) findViewById(R.id.outputDenominator);
+        TextView units1 = (TextView) findViewById(R.id.outputUnits1);
+        TextView outputInch = (TextView) findViewById(R.id.outputInch);
+        TextView units2 = (TextView) findViewById(R.id.outputUnits2);
         BigDecimal integerPart = output;
-        String fractionPart = "";
+        String[] fractionPart = new String[2];
 
         // if there is a decimal point, break the output into parts
         String outputString = output.toString();
@@ -464,27 +473,22 @@ public class MainActivity extends Activity {
         }
 
         BigDecimal feetInch[] = integerPart.divideAndRemainder(new BigDecimal("12"));
-        String feetInchOutput = "";
         // add feet
         if (feetInch[0].compareTo(BigDecimal.ZERO) != 0) {
-            feetInchOutput += remove_trailing_zeros(feetInch[0]);
-            feetInchOutput += "'";
+            outputText.setText(remove_trailing_zeros(feetInch[0]));
+            units1.setText("ft");  // TODO string reference
         }
         // add inches
         if (feetInch[1].compareTo(BigDecimal.ZERO) != 0) {
-            feetInchOutput += " " + remove_trailing_zeros(feetInch[1]);
-            // add inch symbol here if there is no fraction
-            if (fractionPart == null) {
-                feetInchOutput += '"';
-            }
+            outputInch.setText(remove_trailing_zeros(feetInch[1]));
+            units2.setText("in"); // TODO string reference
         }
         // add fractions
         if (fractionPart != null) {
-            feetInchOutput += " ";
-            feetInchOutput += fractionPart;
-            feetInchOutput += '"';
+            fractionNum.setText(fractionPart[0]);
+            fractionDem.setText(fractionPart[1]);
+            units2.setText("in"); // TODO string reference
         }
-        outputText.setText(feetInchOutput);
     }
 
     public void format_feet_only(TextView outputText) {
@@ -493,7 +497,7 @@ public class MainActivity extends Activity {
         boolean feetFractions = sharedPref.getBoolean("pref_feet_display", true);
 
         String feetOutput = "";
-        String fractionPart = "";
+        String[] fractionPart = new String[2];
         BigDecimal feet = output.divide(new BigDecimal("12"), 9, BigDecimal.ROUND_HALF_UP);
         // if there is a decimal point, break the output into parts
         if (feetFractions) {
@@ -524,7 +528,7 @@ public class MainActivity extends Activity {
 
     public void format_inch_only(TextView outputText) {
         BigDecimal integerPart = output;
-        String fractionPart = "";
+        String[] fractionPart = new String[2];
         // if there is a decimal point, break the output into parts
         String outputString = output.toString();
         if (outputString.contains(".")) {
@@ -549,7 +553,7 @@ public class MainActivity extends Activity {
 
     public void format_fraction(TextView outputText) {
         BigDecimal integerPart = output;
-        String fractionPart = "";
+        String[] fractionPart = new String[2];
         // if there is a decimal point, break the output into parts
         String outputString = output.toString();
         if (outputString.contains(".")) {
