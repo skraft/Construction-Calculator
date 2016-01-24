@@ -15,84 +15,91 @@
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true">
 
-        <LinearLayout
-            android:orientation="horizontal"
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:id="@+id/oplist"
-                android:textSize="30dp"
-                android:layout_weight="1"
-                android:background="#323232"
-                android:gravity="right"
-                android:paddingRight="10dp" />
-        </LinearLayout>
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/oplist"
+            android:textSize="30sp"
+            android:background="#323232"
+            android:textIsSelectable="false"
+            android:paddingEnd="10dp"
+            android:paddingStart="10dp"
+            android:gravity="end"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp" />
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:background="#323232">
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="fill_parent"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="0"
                 android:id="@+id/outputText"
-                android:textSize="50dp"
+                android:textSize="50sp"
                 android:layout_weight="1"
-                android:background="#323232"
-                android:gravity="right"
-                android:paddingRight="10dp" />
+                android:gravity="end" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:id="@+id/outputUnits1"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:id="@+id/outputInch"
+                android:textSize="50sp" />
 
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_weight="0">
+                android:layout_weight="0"
+                android:gravity="center">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="#323232"
-                    android:textSize="25dp"
-                    android:text="3"
-                    android:id="@+id/textView" />
+                    android:textSize="25sp"
+                    android:id="@+id/outputNumerator"
+                    android:gravity="center"
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
 
-                <TextView
+                <LinearLayout
+                    android:orientation="horizontal"
                     android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:text="_"
-                    android:layout_weight="1"
-                    android:background="#323232"
-                    android:textSize="25dp"
-                    android:id="@+id/textView4" />
+                    android:layout_height="2dp"
+                    android:background="#cecece">
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="#323232"
-                    android:textSize="25dp"
-                    android:text="4"
-                    android:id="@+id/textView2" />
+                    android:textSize="25sp"
+                    android:id="@+id/outputDenominator"
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
+
             </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="fill_parent"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text='"'
-                android:id="@+id/textView3"
-                android:textSize="50dp"
-                android:layout_weight="0"
-                android:background="#323232" />
+                android:id="@+id/outputUnits2"
+                android:textIsSelectable="false"
+                android:paddingEnd="8dp"
+                android:paddingStart="2dp"
+                android:paddingRight="8dp"
+                android:paddingLeft="2dp" />
 
         </LinearLayout>
 
@@ -143,32 +150,32 @@
                 android:layout_height="match_parent"
                 android:text="@string/feet"
                 android:id="@+id/button_feet"
-                android:layout_weight="1"
-                android:onClick="clickFeet" />
+                android:onClick="clickFeet"
+                android:layout_weight=".25" />
 
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="@string/inch"
                 android:id="@+id/button_inch"
-                android:layout_weight="1"
-                android:onClick="clickInch" />
+                android:onClick="clickInch"
+                android:layout_weight=".25" />
 
-            <Button
+            <ImageButton
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="∕"
                 android:id="@+id/button_fraction"
-                android:layout_weight="1"
-                android:onClick="clickFraction" />
+                android:src="@drawable/ic_fraction_white_24dp"
+                android:onClick="clickFraction"
+                android:layout_weight=".25" />
 
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="+/-"
                 android:id="@+id/button_neg"
-                android:layout_weight="1"
-                android:onClick="clickNegative" />
+                android:onClick="clickNegative"
+                android:layout_weight=".25" />
         </LinearLayout>
 
         <LinearLayout
