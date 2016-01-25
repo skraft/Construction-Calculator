@@ -28,8 +28,7 @@ public class MainActivity extends Activity {
         super.onSaveInstanceState(outState);
         // store all values
         outState.putStringArrayList("opList", opList);
-        outState.putString("buttonString", buttonString);
-        outState.putString("numInputString", numInputString);
+        outState.putString("inputString", inputString);
         outState.putString("numeratorInput", numeratorInput);
         outState.putString("inputNumber", inputNumber.toString());
         outState.putString("output", output.toString());
@@ -53,8 +52,7 @@ public class MainActivity extends Activity {
             // the application is being reloaded
             // Toast.makeText(this, savedInstanceState.getString("uiOutputText"), Toast.LENGTH_LONG).show();
             opList = savedInstanceState.getStringArrayList("opList");
-            buttonString = savedInstanceState.getString("buttonString");
-            numInputString = savedInstanceState.getString("numInputString");
+            inputString = savedInstanceState.getString("inputString");
             numeratorInput = savedInstanceState.getString("numeratorInput");
             inputNumber = new BigDecimal(savedInstanceState.getString("inputNumber"));
             output = new BigDecimal(savedInstanceState.getString("output"));
@@ -96,25 +94,21 @@ public class MainActivity extends Activity {
 
 
     ArrayList<String> opList = new ArrayList<>();
-    String buttonString = "";
-    String numInputString = "";
+    String inputString = "";
     String numeratorInput = "";
-    BigDecimal inputNumber = new BigDecimal("0");  // for calculating feet / inches
-    BigDecimal output = new BigDecimal("0");  // the output of the calc function
 
     Boolean feetAdded = false;
     Boolean inchAdded = false;
     Boolean fractionAdded = false;  // tracks fraction input until clear or calculate is pushed
     Boolean addingFraction = false;  // tracks if a fraction is currently being typed
-
     String units = "decimal";
 
+    BigDecimal inputNumber = new BigDecimal("0");  // for calculating feet / inches
+    BigDecimal output = new BigDecimal("0");  // the output of the calc function
+
+    /*
     public void clickConvert(View view) {
         final String[] convert_items = getResources().getStringArray(R.array.convert_types);
-        // check for input in progress and run calculate function if necessary
-//        if (numInputString != null) {
-//            clickCalculate(view);
-//        }
         // create pop up dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.convert_title);
@@ -126,37 +120,150 @@ public class MainActivity extends Activity {
         AlertDialog alert = builder.create();
         alert.show();
     }
+    */
+
+    public void clear(View view) {
+        TextView debugText = (TextView) findViewById(R.id.oplist);
+        TextView outputText = (TextView) findViewById(R.id.outputText);
+        TextView units1 = (TextView) findViewById(R.id.outputUnits1);
+        TextView outputInch = (TextView) findViewById(R.id.outputInch);
+        TextView fractionNum = (TextView) findViewById(R.id.outputNumerator);
+        TextView fractionDem = (TextView) findViewById(R.id.outputDenominator);
+        TextView units2 = (TextView) findViewById(R.id.outputUnits2);
+
+        // clear global variables
+        opList.clear();
+        inputString = "";
+        numeratorInput = "";
+        feetAdded = false;
+        inchAdded = false;
+        fractionAdded = false;
+        addingFraction = false;
+        units = "decimal";
+        inputNumber = BigDecimal.ZERO;
+        output = BigDecimal.ZERO;
+
+        // clear UI elements
+        debugText.setText("");
+        outputText.setText("0");
+        units1.setText("");
+        outputInch.setText("");
+        fractionNum.setText("");
+        fractionDem.setText("");
+        units2.setText("");
+
+        // reset colors
+        fractionNum.setBackgroundResource(R.color.uiDefault);
+        fractionDem.setBackgroundResource(R.color.uiHighlight);
+    }
+
+    public void clickBackspace(View view) {
+        // remove the last character in the numInputString
+        if (inputString.length() > 0) {
+            inputString = inputString.substring(0, inputString.length() - 1);
+        }
+        else {
+            inputString = "";
+        }
+        updateTextFields(view);
+    }
+
+    public void clickFeet(View view) {
+        TextView units1 = (TextView) findViewById(R.id.outputUnits1);
+        if (!inputString.equals("") && !inputString.equals("-")) {
+            feetAdded = true;
+            units1.setText("ft");  // TODO string reference
+            // multiply input times 12
+            BigDecimal feet = new BigDecimal(inputString);
+            inputNumber = feet.multiply(new BigDecimal("12")).add(inputNumber);
+        }
+        inputString = "";
+    }
+
+    public void clickInch(View view) {
+        TextView units2 = (TextView) findViewById(R.id.outputUnits2);
+        if (!inputString.equals("") && !inputString.equals("-")) {
+            // get current number entry
+            inchAdded = true;
+            units2.setText("in");  // TODO string reference
+            // add input value
+            BigDecimal inch = new BigDecimal(inputString);
+            inputNumber = inch.add(inputNumber);
+        }
+        updateTextFields(view);
+        inputString = "";
+    }
+
+    public void clickFraction(View view) {
+        TextView fractionNum = (TextView) findViewById(R.id.outputNumerator);
+        TextView fractionDem = (TextView) findViewById(R.id.outputDenominator);
+        if (!addingFraction) {
+            fractionNum.setBackgroundResource(R.color.uiHighlight);
+        }
+        else {
+            fractionNum.setBackgroundResource(R.color.uiDefault);
+            fractionDem.setBackgroundResource(R.color.uiHighlight);
+        }
+
+        if (!inputString.equals("") && !inputString.equals("-")) {
+            fractionAdded = true;
+            addingFraction = true;
+            // define numerator
+            numeratorInput = inputString;
+            updateTextFields(view);
+        }
+        inputString = "";
+    }
 
     public void clickNumber(View view) {
-        TextView outputText = (TextView) findViewById(R.id.outputText);
-        TextView debugText = (TextView) findViewById(R.id.oplist);
         Button numberButton = (Button) view;
-        buttonString = numberButton.getText().toString();
         // add the number to the output string for the view
-        numInputString = numInputString + buttonString;
-        outputText.setText(numInputString);
+        inputString = inputString + numberButton.getText().toString();
+        updateTextFields(view);
         // if the only entry in the opList is another number, clear: (starting a fresh calculation)
         if (opList.size() == 1) {
             String entry = opList.get(0);
             if (!entry.contains("x") && !entry.contains("÷") && !entry.contains("+") && !entry.contains("−")) {
-                opList.clear();
-                debugText.setText("");
+                clear(view);
+                updateTextFields(view);
             }
         }
     }
 
-    public void clickBackspace(View view) {
+    public void updateTextFields(View view) {
+        TextView debugText = (TextView) findViewById(R.id.oplist);
         TextView outputText = (TextView) findViewById(R.id.outputText);
-        // remove the last character in the numInputString
-        if (numInputString.length() > 0) {
-            numInputString = numInputString.substring(0, numInputString.length() - 1);
+        TextView outputInch = (TextView) findViewById(R.id.outputInch);
+        TextView fractionNum = (TextView) findViewById(R.id.outputNumerator);
+        TextView fractionDem = (TextView) findViewById(R.id.outputDenominator);
+
+        if (!feetAdded && !inchAdded) {
+            outputText.setText(inputString);
         }
-        else {
-            numInputString = "";
+
+        else if (feetAdded) {
+            outputInch.setText(inputString);
         }
-        outputText.setText(numInputString);
+
+        if (fractionAdded) {
+            if (addingFraction) {
+                fractionNum.setText(numeratorInput);
+            }
+            else {
+                fractionDem.setText(inputString);
+            }
+        }
+
+
+        // convert opList to a string and display in the debug textView
+        String opListString = "";
+        for (String op : opList) {
+            opListString += op + " ";
+        }
+        debugText.setText(opListString);
     }
 
+    /*
     public void clickNegative(View view) {
         TextView outputText = (TextView) findViewById(R.id.outputText);
         // add a negative if positive, remove the negative if negative
@@ -167,53 +274,6 @@ public class MainActivity extends Activity {
             numInputString = "-" + numInputString;
         }
         outputText.setText(numInputString);
-    }
-
-    public void clickFeet(View view) {
-        TextView outputText = (TextView) findViewById(R.id.outputText);
-        TextView debugText = (TextView) findViewById(R.id.oplist);
-        if (!numInputString.equals("") && !numInputString.equals("-")) {
-            // get current number entry
-            String outText = numInputString + "' ";
-            outputText.setText(outText);
-            feetAdded = true;
-            // multiply input times 12
-            BigDecimal feet = new BigDecimal(numInputString);
-            inputNumber = feet.multiply(new BigDecimal("12")).add(inputNumber);
-            // update debug
-            debugText.setText(inputNumber.toString());
-        }
-        numInputString = "";
-    }
-
-    public void clickInch(View view) {
-        TextView outputText = (TextView) findViewById(R.id.outputText);
-        TextView debugText = (TextView) findViewById(R.id.oplist);
-        if (!numInputString.equals("") && !numInputString.equals("-")) {
-            // get current number entry
-            String outText = numInputString + '"';
-            outputText.setText(outText);
-            inchAdded = true;
-            // add input value
-            BigDecimal inch = new BigDecimal(numInputString);
-            inputNumber = inch.add(inputNumber);
-            // update debug
-            debugText.setText(inputNumber.toString());
-        }
-        numInputString = "";
-    }
-
-    public void clickFraction(View view) {
-        TextView outputText = (TextView) findViewById(R.id.outputText);
-        if (!numInputString.equals("") && !numInputString.equals("-")) {
-            fractionAdded = true;
-            addingFraction = true;
-            // define numerator
-            numeratorInput = numInputString;
-            String outText = numInputString + "/";
-            outputText.setText(outText);
-        }
-        numInputString = "";
     }
 
     public void clickOperation(View view) {
@@ -276,10 +336,6 @@ public class MainActivity extends Activity {
         fractionAdded = false;
         addingFraction = false;
         units = "decimal";
-    }
-
-    public void update_text_fields(View view) {
-        String null = "null";
     }
 
     public void compile_input_number() {
@@ -576,4 +632,5 @@ public class MainActivity extends Activity {
         String cleanedOutput = remove_trailing_zeros(output);
         outputText.setText(cleanedOutput);
     }
+    */
 }
