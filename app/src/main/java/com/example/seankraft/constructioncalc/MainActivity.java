@@ -13,6 +13,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.Toast;
@@ -35,7 +37,7 @@ public class MainActivity extends Activity {
         outState.putBoolean("feetAdded", feetAdded);
         outState.putBoolean("inchAdded", inchAdded);
         outState.putBoolean("fractionAdded", fractionAdded);
-        outState.putBoolean("addingFraction", addingFraction);
+        outState.putBoolean("addingNumerator", addingNumerator);
         outState.putString("units", units);
         TextView outputText = (TextView) findViewById(R.id.outputText);
         outState.putString("uiOutputText", outputText.getText().toString());
@@ -59,7 +61,7 @@ public class MainActivity extends Activity {
             feetAdded = savedInstanceState.getBoolean("feetAdded");
             inchAdded = savedInstanceState.getBoolean("inchAdded");
             fractionAdded = savedInstanceState.getBoolean("fractionAdded");
-            addingFraction = savedInstanceState.getBoolean("addingFraction");
+            addingNumerator = savedInstanceState.getBoolean("addingNumerator");
             units = savedInstanceState.getString("units");
             TextView outputText = (TextView) findViewById(R.id.outputText);
             outputText.setText(savedInstanceState.getString("uiOutputText"));
@@ -99,8 +101,8 @@ public class MainActivity extends Activity {
 
     Boolean feetAdded = false;
     Boolean inchAdded = false;
+    Boolean addingNumerator = false;  // tracks if a fraction is currently being typed
     Boolean fractionAdded = false;  // tracks fraction input until clear or calculate is pushed
-    Boolean addingFraction = false;  // tracks if a fraction is currently being typed
     String units = "decimal";
 
     BigDecimal inputNumber = new BigDecimal("0");  // for calculating feet / inches
@@ -138,7 +140,7 @@ public class MainActivity extends Activity {
         feetAdded = false;
         inchAdded = false;
         fractionAdded = false;
-        addingFraction = false;
+        addingNumerator = false;
         units = "decimal";
         inputNumber = BigDecimal.ZERO;
         output = BigDecimal.ZERO;
@@ -154,7 +156,7 @@ public class MainActivity extends Activity {
 
         // reset colors
         fractionNum.setBackgroundResource(R.color.uiDefault);
-        fractionDem.setBackgroundResource(R.color.uiHighlight);
+        fractionDem.setBackgroundResource(R.color.uiDefault);
     }
 
     public void clickBackspace(View view) {
@@ -197,22 +199,20 @@ public class MainActivity extends Activity {
     public void clickFraction(View view) {
         TextView fractionNum = (TextView) findViewById(R.id.outputNumerator);
         TextView fractionDem = (TextView) findViewById(R.id.outputDenominator);
-        if (!addingFraction) {
+        inputString = "";
+        if (!addingNumerator && !fractionAdded) {
+            // highlight the numerator input
             fractionNum.setBackgroundResource(R.color.uiHighlight);
+            fractionNum.setText("  ");
+            addingNumerator = true;
         }
-        else {
+        else if (addingNumerator && !fractionAdded) {
+            // highlight the denominator for input
             fractionNum.setBackgroundResource(R.color.uiDefault);
             fractionDem.setBackgroundResource(R.color.uiHighlight);
-        }
-
-        if (!inputString.equals("") && !inputString.equals("-")) {
+            fractionDem.setText("  ");
             fractionAdded = true;
-            addingFraction = true;
-            // define numerator
-            numeratorInput = inputString;
-            updateTextFields(view);
         }
-        inputString = "";
     }
 
     public void clickNumber(View view) {
@@ -237,23 +237,17 @@ public class MainActivity extends Activity {
         TextView fractionNum = (TextView) findViewById(R.id.outputNumerator);
         TextView fractionDem = (TextView) findViewById(R.id.outputDenominator);
 
-        if (!feetAdded && !inchAdded) {
-            outputText.setText(inputString);
-        }
-
-        else if (feetAdded) {
-            outputInch.setText(inputString);
-        }
-
-        if (fractionAdded) {
-            if (addingFraction) {
-                fractionNum.setText(numeratorInput);
-            }
-            else {
+        if (!inputString.equals("") && !inputString.equals("-")) {
+            if (!feetAdded && !inchAdded && !addingNumerator && !fractionAdded) {
+                outputText.setText(inputString);
+            } else if (feetAdded && !addingNumerator && !fractionAdded) {
+                outputInch.setText(inputString);
+            } else if (addingNumerator && !fractionAdded) {
+                fractionNum.setText(inputString);
+            } else if (addingNumerator && fractionAdded) {
                 fractionDem.setText(inputString);
             }
         }
-
 
         // convert opList to a string and display in the debug textView
         String opListString = "";
