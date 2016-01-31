@@ -192,7 +192,6 @@ public class MainActivity extends Activity {
             BigDecimal inch = new BigDecimal(inputString);
             inputNumber = inch.add(inputNumber);
         }
-        updateTextFields(view);
         inputString = "";
     }
 
@@ -240,8 +239,11 @@ public class MainActivity extends Activity {
         if (!inputString.equals("") && !inputString.equals("-")) {
             if (!feetAdded && !inchAdded && !addingNumerator && !fractionAdded) {
                 outputText.setText(inputString);
-            } else if (feetAdded && !addingNumerator && !fractionAdded) {
+            } else if (feetAdded && !inchAdded && !addingNumerator && !fractionAdded) {
                 outputInch.setText(inputString);
+            } else if (feetAdded && inchAdded && !addingNumerator && !fractionAdded) {
+                fractionNum.setText(inputString);
+                addingNumerator = true;
             } else if (addingNumerator && !fractionAdded) {
                 fractionNum.setText(inputString);
             } else if (addingNumerator && fractionAdded) {
