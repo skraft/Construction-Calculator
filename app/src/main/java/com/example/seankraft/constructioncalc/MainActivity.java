@@ -1,17 +1,20 @@
 package com.example.seankraft.constructioncalc;
 
 import java.util.ArrayList;
-
+import java.math.*;
+import java.util.regex.Pattern;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Button;
-
-import java.math.*;
 
 //TODO oder of operations : multiply / divide  and  add / subtract should run left to right
 
@@ -100,7 +103,6 @@ public class MainActivity extends Activity {
     BigDecimal inputNumber = new BigDecimal("0");  // for calculating feet / inches
     BigDecimal output = new BigDecimal("0");  // the output of the calc function
 
-    /*
     public void clickConvert(View view) {
         final String[] convert_items = getResources().getStringArray(R.array.convert_types);
         // create pop up dialog
@@ -114,7 +116,6 @@ public class MainActivity extends Activity {
         AlertDialog alert = builder.create();
         alert.show();
     }
-    */
 
     public void clear(View view) {
         TextView debugText = (TextView) findViewById(R.id.oplist);
@@ -423,26 +424,23 @@ public class MainActivity extends Activity {
             }
         }
 
-        TextView outputText = (TextView) findViewById(R.id.outputText);
-
         if (formatMode == 0) {
-            format_feet_and_inch(outputText);
+            format_feet_and_inch();
         }
         else if (formatMode == 1) {
-            format_feet_only(outputText);
+            format_feet_only();
         }
         else if (formatMode == 2) {
-            format_inch_only(outputText);
+            format_inch_only();
         }
         else if (formatMode == 3) {
-            format_fraction(outputText);
+            format_fraction();
         }
         else if (formatMode == 4) {
-            format_decimal(outputText);
+            format_decimal();
         }
     }
 
-    /*
     public String remove_trailing_zeros(BigDecimal input) {
         // TODO remove some trailing zeros (4.12030900000 becomes 4.120309)
         // remove zero value decimals. Example (4.0 becomes 4)
@@ -501,12 +499,14 @@ public class MainActivity extends Activity {
         }
     }
 
-    public void format_feet_and_inch(TextView outputText) {
-        TextView fractionNum = (TextView) findViewById(R.id.outputNumerator);
-        TextView fractionDem = (TextView) findViewById(R.id.outputDenominator);
+    public void format_feet_and_inch() {
+        TextView outputText = (TextView) findViewById(R.id.outputText);
         TextView units1 = (TextView) findViewById(R.id.outputUnits1);
         TextView outputInch = (TextView) findViewById(R.id.outputInch);
+        TextView fractionNum = (TextView) findViewById(R.id.outputNumerator);
+        TextView fractionDem = (TextView) findViewById(R.id.outputDenominator);
         TextView units2 = (TextView) findViewById(R.id.outputUnits2);
+
         BigDecimal integerPart = output;
         String[] fractionPart = new String[2];
 
@@ -537,7 +537,11 @@ public class MainActivity extends Activity {
         }
     }
 
-    public void format_feet_only(TextView outputText) {
+    public void format_feet_only() {
+        TextView outputText = (TextView) findViewById(R.id.outputText);
+        TextView fractionNum = (TextView) findViewById(R.id.outputNumerator);
+        TextView fractionDem = (TextView) findViewById(R.id.outputDenominator);
+        TextView units2 = (TextView) findViewById(R.id.outputUnits2);
         // find the decimal vs fraction boolean from the app preferences
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean feetFractions = sharedPref.getBoolean("pref_feet_display", true);
@@ -556,23 +560,22 @@ public class MainActivity extends Activity {
             else {
                 feetOutput = feet.toString();
             }
-            // add feet
-            if (fractionPart == null) {
-                feetOutput = feetOutput + "'";
-            }
-            else {
-                feetOutput = feetOutput + " " + fractionPart + "'";
-            }
             outputText.setText(feetOutput);
+            // add fraction
+            if (fractionPart != null) {
+                fractionNum.setText(fractionPart[0]);
+                fractionDem.setText(fractionPart[1]);
+            }
+            units2.setText("ft");  // TODO string reference
         }
         else {
-            feetOutput = remove_trailing_zeros(feet);
-            feetOutput = feetOutput + "'";
-            outputText.setText(feetOutput);
+            outputText.setText(remove_trailing_zeros(feet));
+            units2.setText("ft");  // TODO string reference
         }
     }
 
-    public void format_inch_only(TextView outputText) {
+    public void format_inch_only() {
+        TextView outputText = (TextView) findViewById(R.id.outputText);
         BigDecimal integerPart = output;
         String[] fractionPart = new String[2];
         // if there is a decimal point, break the output into parts
@@ -597,7 +600,8 @@ public class MainActivity extends Activity {
         outputText.setText(inchOutput);
     }
 
-    public void format_fraction(TextView outputText) {
+    public void format_fraction() {
+        TextView outputText = (TextView) findViewById(R.id.outputText);
         BigDecimal integerPart = output;
         String[] fractionPart = new String[2];
         // if there is a decimal point, break the output into parts
@@ -618,9 +622,9 @@ public class MainActivity extends Activity {
         outputText.setText(fractionOutput);
     }
 
-    public void format_decimal(TextView outputText) {
+    public void format_decimal() {
+        TextView outputText = (TextView) findViewById(R.id.outputText);
         String cleanedOutput = remove_trailing_zeros(output);
         outputText.setText(cleanedOutput);
     }
-    */
 }
