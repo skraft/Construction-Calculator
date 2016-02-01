@@ -135,7 +135,7 @@
                 android:id="@+id/button_backspace"
                 android:src="@drawable/ic_backspace_white_24dp"
                 android:minHeight="48dp"
-                android:onClick="clickBackspace" />
+                android:onClick="click_backspace" />
 
         </LinearLayout>
 
@@ -150,7 +150,7 @@
                 android:layout_height="match_parent"
                 android:text="@string/feet"
                 android:id="@+id/button_feet"
-                android:onClick="clickFeet"
+                android:onClick="click_feet"
                 android:layout_weight=".25" />
 
             <Button
@@ -158,7 +158,7 @@
                 android:layout_height="match_parent"
                 android:text="@string/inch"
                 android:id="@+id/button_inch"
-                android:onClick="clickInch"
+                android:onClick="click_inch"
                 android:layout_weight=".25" />
 
             <ImageButton
@@ -166,7 +166,7 @@
                 android:layout_height="match_parent"
                 android:id="@+id/button_fraction"
                 android:src="@drawable/ic_fraction_white_24dp"
-                android:onClick="clickFraction"
+                android:onClick="click_fraction"
                 android:layout_weight=".25" />
 
             <Button
@@ -174,7 +174,7 @@
                 android:layout_height="match_parent"
                 android:text="+/-"
                 android:id="@+id/button_neg"
-                android:onClick="clickNegative"
+                android:onClick="click_negative"
                 android:layout_weight=".25" />
         </LinearLayout>
 
@@ -191,7 +191,7 @@
                 android:text="7"
                 android:id="@+id/button_seven"
                 android:layout_weight="1"
-                android:onClick="clickNumber" />
+                android:onClick="click_number" />
 
             <Button
                 android:layout_width="match_parent"
@@ -199,7 +199,7 @@
                 android:text="8"
                 android:id="@+id/button_eight"
                 android:layout_weight="1"
-                android:onClick="clickNumber" />
+                android:onClick="click_number" />
 
             <Button
                 android:layout_width="match_parent"
@@ -207,7 +207,7 @@
                 android:text="9"
                 android:id="@+id/button_nine"
                 android:layout_weight="1"
-                android:onClick="clickNumber" />
+                android:onClick="click_number" />
 
             <Button
                 android:layout_width="match_parent"
@@ -215,7 +215,7 @@
                 android:text="÷"
                 android:id="@+id/button_divide"
                 android:layout_weight="1"
-                android:onClick="clickOperation" />
+                android:onClick="click_operation" />
 
         </LinearLayout>
 
@@ -231,7 +231,7 @@
                 android:text="4"
                 android:id="@+id/button_four"
                 android:layout_weight="1"
-                android:onClick="clickNumber" />
+                android:onClick="click_number" />
 
             <Button
                 android:layout_width="match_parent"
@@ -239,7 +239,7 @@
                 android:text="5"
                 android:id="@+id/button_five"
                 android:layout_weight="1"
-                android:onClick="clickNumber" />
+                android:onClick="click_number" />
 
             <Button
                 android:layout_width="match_parent"
@@ -247,7 +247,7 @@
                 android:text="6"
                 android:id="@+id/button_six"
                 android:layout_weight="1"
-                android:onClick="clickNumber" />
+                android:onClick="click_number" />
 
             <Button
                 style="?android:attr/buttonStyleSmall"
@@ -256,7 +256,7 @@
                 android:text="x"
                 android:id="@+id/button_multiply"
                 android:layout_weight="1"
-                android:onClick="clickOperation" />
+                android:onClick="click_operation" />
 
         </LinearLayout>
 
@@ -273,7 +273,7 @@
                 android:text="1"
                 android:id="@+id/button_one"
                 android:layout_weight="1"
-                android:onClick="clickNumber"/>
+                android:onClick="click_number"/>
 
             <Button
                 android:layout_width="match_parent"
@@ -281,7 +281,7 @@
                 android:text="2"
                 android:id="@+id/button_two"
                 android:layout_weight="1"
-                android:onClick="clickNumber" />
+                android:onClick="click_number" />
 
             <Button
                 android:layout_width="match_parent"
@@ -289,7 +289,7 @@
                 android:text="3"
                 android:id="@+id/button_three"
                 android:layout_weight="1"
-                android:onClick="clickNumber" />
+                android:onClick="click_number" />
 
             <Button
                 android:layout_width="match_parent"
@@ -297,7 +297,7 @@
                 android:text="−"
                 android:id="@+id/button_subtract"
                 android:layout_weight="1"
-                android:onClick="clickOperation" />
+                android:onClick="click_operation" />
 
         </LinearLayout>
 
@@ -313,7 +313,7 @@
                 android:text="."
                 android:id="@+id/button_decimal"
                 android:layout_weight="1"
-                android:onClick="clickNumber" />
+                android:onClick="click_number" />
 
             <Button
                 android:layout_width="match_parent"
@@ -321,7 +321,7 @@
                 android:text="0"
                 android:id="@+id/button_zero"
                 android:layout_weight="1"
-                android:onClick="clickNumber" />
+                android:onClick="click_number" />
 
             <Button
                 android:layout_width="match_parent"
@@ -337,7 +337,7 @@
                 android:text="+"
                 android:id="@+id/button_add"
                 android:layout_weight="1"
-                android:onClick="clickOperation" />
+                android:onClick="click_operation" />
         </LinearLayout>
 
     </LinearLayout>

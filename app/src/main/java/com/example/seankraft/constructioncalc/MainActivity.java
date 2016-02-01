@@ -1,23 +1,15 @@
 package com.example.seankraft.constructioncalc;
 
 import java.util.ArrayList;
-import java.util.regex.Pattern;
+
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Button;
-import android.widget.Toast;
 
 import java.math.*;
 
@@ -36,7 +28,7 @@ public class MainActivity extends Activity {
         outState.putString("output", output.toString());
         outState.putBoolean("feetAdded", feetAdded);
         outState.putBoolean("inchAdded", inchAdded);
-        outState.putBoolean("fractionAdded", fractionAdded);
+        outState.putBoolean("addingDenominator", addingDenominator);
         outState.putBoolean("addingNumerator", addingNumerator);
         outState.putString("units", units);
         TextView outputText = (TextView) findViewById(R.id.outputText);
@@ -60,7 +52,7 @@ public class MainActivity extends Activity {
             output = new BigDecimal(savedInstanceState.getString("output"));
             feetAdded = savedInstanceState.getBoolean("feetAdded");
             inchAdded = savedInstanceState.getBoolean("inchAdded");
-            fractionAdded = savedInstanceState.getBoolean("fractionAdded");
+            addingDenominator = savedInstanceState.getBoolean("addingDenominator");
             addingNumerator = savedInstanceState.getBoolean("addingNumerator");
             units = savedInstanceState.getString("units");
             TextView outputText = (TextView) findViewById(R.id.outputText);
@@ -101,8 +93,8 @@ public class MainActivity extends Activity {
 
     Boolean feetAdded = false;
     Boolean inchAdded = false;
-    Boolean addingNumerator = false;  // tracks if a fraction is currently being typed
-    Boolean fractionAdded = false;  // tracks fraction input until clear or calculate is pushed
+    Boolean addingNumerator = false;  // tracks if a fraction numerator is being added
+    Boolean addingDenominator = false;  // tracks if a fraction denonicator is being added
     String units = "decimal";
 
     BigDecimal inputNumber = new BigDecimal("0");  // for calculating feet / inches
@@ -139,7 +131,7 @@ public class MainActivity extends Activity {
         numeratorInput = "";
         feetAdded = false;
         inchAdded = false;
-        fractionAdded = false;
+        addingDenominator = false;
         addingNumerator = false;
         units = "decimal";
         inputNumber = BigDecimal.ZERO;
@@ -159,7 +151,7 @@ public class MainActivity extends Activity {
         fractionDem.setBackgroundResource(R.color.uiDefault);
     }
 
-    public void clickBackspace(View view) {
+    public void click_backspace(View view) {
         // remove the last character in the numInputString
         if (inputString.length() > 0) {
             inputString = inputString.substring(0, inputString.length() - 1);
@@ -167,10 +159,10 @@ public class MainActivity extends Activity {
         else {
             inputString = "";
         }
-        updateTextFields(view);
+        update_text_fields(view);
     }
 
-    public void clickFeet(View view) {
+    public void click_feet(View view) {
         TextView units1 = (TextView) findViewById(R.id.outputUnits1);
         if (!inputString.equals("") && !inputString.equals("-")) {
             feetAdded = true;
@@ -182,7 +174,7 @@ public class MainActivity extends Activity {
         inputString = "";
     }
 
-    public void clickInch(View view) {
+    public void click_inch(View view) {
         TextView units2 = (TextView) findViewById(R.id.outputUnits2);
         if (!inputString.equals("") && !inputString.equals("-")) {
             // get current number entry
@@ -195,41 +187,92 @@ public class MainActivity extends Activity {
         inputString = "";
     }
 
-    public void clickFraction(View view) {
+    public void click_fraction(View view) {
         TextView fractionNum = (TextView) findViewById(R.id.outputNumerator);
         TextView fractionDem = (TextView) findViewById(R.id.outputDenominator);
-        inputString = "";
-        if (!addingNumerator && !fractionAdded) {
+        if (!addingNumerator && !addingDenominator) {
+            inputString = "";
             // highlight the numerator input
             fractionNum.setBackgroundResource(R.color.uiHighlight);
             fractionNum.setText("  ");
             addingNumerator = true;
         }
-        else if (addingNumerator && !fractionAdded) {
+        else if (addingNumerator && !addingDenominator) {
+            // store the numerator string before clearing
+            numeratorInput = inputString;
+            inputString = "";
             // highlight the denominator for input
             fractionNum.setBackgroundResource(R.color.uiDefault);
             fractionDem.setBackgroundResource(R.color.uiHighlight);
             fractionDem.setText("  ");
-            fractionAdded = true;
+            addingDenominator = true;
         }
     }
 
-    public void clickNumber(View view) {
+    public void click_number(View view) {
         Button numberButton = (Button) view;
         // add the number to the output string for the view
         inputString = inputString + numberButton.getText().toString();
-        updateTextFields(view);
+        update_text_fields(view);
         // if the only entry in the opList is another number, clear: (starting a fresh calculation)
         if (opList.size() == 1) {
             String entry = opList.get(0);
             if (!entry.contains("x") && !entry.contains("÷") && !entry.contains("+") && !entry.contains("−")) {
                 clear(view);
-                updateTextFields(view);
+                update_text_fields(view);
             }
         }
     }
 
-    public void updateTextFields(View view) {
+    public void click_negative(View view) {
+
+        // add a negative if positive, remove the negative if negative
+        if (inputString.startsWith("-")) {
+            inputString = inputString.substring(1, inputString.length());
+        }
+        else {
+            inputString = "-" + inputString;
+        }
+        update_text_fields(view);
+    }
+
+    public void click_operation(View view) {
+        compile_input_number();
+        // get the button text
+        Button opButton = (Button) view;
+        String buttonString = opButton.getText().toString();
+        if (opList.size() > 0) { // don't add operators if no number has been entered
+            // don't allow two operators to be entered back to back : replace the last operator
+            String lastEntry = opList.get(opList.size() - 1);
+            if (lastEntry.contains("x") || lastEntry.contains("÷") || lastEntry.contains("+") || lastEntry.contains("−")) {
+                opList.remove(opList.size() - 1); // replace the last entry with a new operator
+                opList.add(buttonString);
+            } else {
+                opList.add(buttonString);
+            }
+        }
+        update_text_fields(view);
+        // clear the variables for the next number entry
+        clear_input(view);  // resets outputText and input values
+    }
+
+    public void clickCalculate(View view) {
+        // add the current concatenated number to opList
+        compile_input_number();
+        // update the DEBUG window
+        update_text_fields(view);
+        // clear the last number input
+        clear_input(view);
+        // check for an invalid opList
+        clean_op_list();
+        // start calculate function
+        calculate();
+        // format the output
+        int formatMode = -1;  // -1 means no predetermined format
+        format_output(formatMode);
+    }
+
+    public void update_text_fields(View view) {
         TextView debugText = (TextView) findViewById(R.id.oplist);
         TextView outputText = (TextView) findViewById(R.id.outputText);
         TextView outputInch = (TextView) findViewById(R.id.outputInch);
@@ -237,17 +280,17 @@ public class MainActivity extends Activity {
         TextView fractionDem = (TextView) findViewById(R.id.outputDenominator);
 
         if (!inputString.equals("") && !inputString.equals("-")) {
-            if (!feetAdded && !inchAdded && !addingNumerator && !fractionAdded) {
-                outputText.setText(inputString);
-            } else if (feetAdded && !inchAdded && !addingNumerator && !fractionAdded) {
-                outputInch.setText(inputString);
-            } else if (feetAdded && inchAdded && !addingNumerator && !fractionAdded) {
+            if (addingDenominator) {
+                fractionDem.setText(inputString);
+            } else if (addingNumerator) {
+                fractionNum.setText(inputString);
+            } else if (inchAdded) {
                 fractionNum.setText(inputString);
                 addingNumerator = true;
-            } else if (addingNumerator && !fractionAdded) {
-                fractionNum.setText(inputString);
-            } else if (addingNumerator && fractionAdded) {
-                fractionDem.setText(inputString);
+            } else if (feetAdded) {
+                outputInch.setText(inputString);
+            } else {
+                outputText.setText(inputString);
             }
         }
 
@@ -259,100 +302,50 @@ public class MainActivity extends Activity {
         debugText.setText(opListString);
     }
 
-    /*
-    public void clickNegative(View view) {
-        TextView outputText = (TextView) findViewById(R.id.outputText);
-        // add a negative if positive, remove the negative if negative
-        if (numInputString.startsWith("-")) {
-            numInputString = numInputString.substring(1, numInputString.length());
-        }
-        else {
-            numInputString = "-" + numInputString;
-        }
-        outputText.setText(numInputString);
-    }
-
-    public void clickOperation(View view) {
-        compile_input_number();
-        // get the button text
-        Button opButton = (Button) view;
-        buttonString = opButton.getText().toString();
-        if (opList.size() > 0) { // don't add operators if no number has been entered
-            // don't allow two operators to be entered back to back : replace the last operator
-            String lastEntry = opList.get(opList.size() - 1);
-            if (lastEntry.contains("x") || lastEntry.contains("÷") || lastEntry.contains("+") || lastEntry.contains("−")) {
-                opList.remove(opList.size() - 1); // replace the last entry with a new operator
-                opList.add(buttonString);
-            } else {
-                opList.add(buttonString);
-            }
-        }
-        // update the DEBUG window
-        TextView debugText = (TextView) findViewById(R.id.oplist);
-        debugText.setText(opList.toString());
-        // clear the variables for the next number entry
-        numInputString = "";
-        numeratorInput = "";
-        inputNumber = BigDecimal.ZERO;
-        addingFraction = false;
-    }
-
-    public void clickCalculate(View view) {
-        // add the current concatenated number to operation list
-        compile_input_number();
-        // update the DEBUG window
-        TextView debugText = (TextView) findViewById(R.id.oplist);
-        debugText.setText(opList.toString());
-        // check for an invalid opList
-        cleanOpList();
-        // start calculate function
-        calculate();
-        // format the output
-        int formatMode = -1;  // -1 means no predetermined format
-        format_output(formatMode);
-        // clear the last number input
-        addingFraction = false;  // hitting "=" concludes fraction entry
-        numInputString = "";
-        inputNumber = BigDecimal.ZERO;
-    }
-
-    public void clear(View view) {
-        TextView outputText = (TextView) findViewById(R.id.outputText);
-        TextView debugText = (TextView) findViewById(R.id.oplist);
-        outputText.setText("0");
-        debugText.setText("");
-        // clear variables
-        opList.clear();
-        numInputString = "";
-        numeratorInput = "";
-        inputNumber = BigDecimal.ZERO;
-        output = BigDecimal.ZERO;
-        feetAdded = false;
-        inchAdded = false;
-        fractionAdded = false;
-        addingFraction = false;
-        units = "decimal";
-    }
-
     public void compile_input_number() {
         // This function compiles any feet, inch, and fraction input into the opList
-        if (addingFraction) {
+        if (addingDenominator) {
             BigDecimal numerator = new BigDecimal(numeratorInput);
-            BigDecimal denominator = new BigDecimal(numInputString);
+            BigDecimal denominator = new BigDecimal(inputString);
             inputNumber = numerator.divide(denominator, 9, BigDecimal.ROUND_HALF_UP).add(inputNumber);
         }
         // if there is an inputNumber; add it to the opList
         if (inputNumber.compareTo(BigDecimal.ZERO) != 0) {
             opList.add(inputNumber.toString());
         }
+        // otherwise add the current inputString to the opList
         else {
-            if (!numInputString.equals("") && !numInputString.equals("-")) {
-                opList.add(numInputString);
+            if (!inputString.equals("") && !inputString.equals("-")) {
+                opList.add(inputString);
             }
         }
     }
 
-    public void cleanOpList() {
+    public void clear_input(View view) {
+        TextView outputText = (TextView) findViewById(R.id.outputText);
+        TextView units1 = (TextView) findViewById(R.id.outputUnits1);
+        TextView outputInch = (TextView) findViewById(R.id.outputInch);
+        TextView fractionNum = (TextView) findViewById(R.id.outputNumerator);
+        TextView fractionDem = (TextView) findViewById(R.id.outputDenominator);
+        TextView units2 = (TextView) findViewById(R.id.outputUnits2);
+
+        outputText.setText("");
+        units1.setText("");
+        outputInch.setText("");
+        fractionNum.setText("");
+        fractionDem.setText("");
+        units2.setText("");
+
+        inputString = "";
+        numeratorInput = "";
+        inputNumber = BigDecimal.ZERO;
+        feetAdded = false;
+        inchAdded = false;
+        addingNumerator = false;
+        addingDenominator = false;
+    }
+
+    public void clean_op_list() {
         String lastEntry = opList.get(opList.size() - 1);
         // if the last entry is an operator : remove it
         if (lastEntry.contains("x") || lastEntry.contains("÷") || lastEntry.contains("+") || lastEntry.contains("−")) {
@@ -410,6 +403,46 @@ public class MainActivity extends Activity {
         }
     }
 
+    public void format_output(int formatMode) {
+        // This function checks the current 'units' value and writes the output to the UI
+        // in the appropriate format. It also checks the current fraction resolution and
+        // converts the decimal value to the correct fraction.
+
+        // if no format mode is defined, check units to determine format mode
+        if (formatMode == -1) {
+            if (addingDenominator || feetAdded || inchAdded) {
+                if (feetAdded || inchAdded) {
+                    formatMode = 0;  // feet and inches mode
+                }
+                else {
+                    formatMode = 3;  // fraction mode
+                }
+            }
+            else {
+                formatMode = 4;  // decimal mode
+            }
+        }
+
+        TextView outputText = (TextView) findViewById(R.id.outputText);
+
+        if (formatMode == 0) {
+            format_feet_and_inch(outputText);
+        }
+        else if (formatMode == 1) {
+            format_feet_only(outputText);
+        }
+        else if (formatMode == 2) {
+            format_inch_only(outputText);
+        }
+        else if (formatMode == 3) {
+            format_fraction(outputText);
+        }
+        else if (formatMode == 4) {
+            format_decimal(outputText);
+        }
+    }
+
+    /*
     public String remove_trailing_zeros(BigDecimal input) {
         // TODO remove some trailing zeros (4.12030900000 becomes 4.120309)
         // remove zero value decimals. Example (4.0 becomes 4)
@@ -465,45 +498,6 @@ public class MainActivity extends Activity {
         }
         else {
             return null;
-        }
-    }
-
-    public void format_output(int formatMode) {
-        // This function checks the current 'units' value and writes the output to the UI
-        // in the appropriate format. It also checks the current fraction resolution and
-        // converts the decimal value to the correct fraction.
-
-        // if no format mode is defined, check units to determine format mode
-        if (formatMode == -1) {
-            if (fractionAdded || feetAdded || inchAdded) {
-                if (feetAdded || inchAdded) {
-                    formatMode = 0;  // feet and inches mode
-                }
-                else {
-                    formatMode = 3;  // fraction mode
-                }
-            }
-            else {
-                formatMode = 4;  // decimal mode
-            }
-        }
-
-        TextView outputText = (TextView) findViewById(R.id.outputText);
-
-        if (formatMode == 0) {
-            format_feet_and_inch(outputText);
-        }
-        else if (formatMode == 1) {
-            format_feet_only(outputText);
-        }
-        else if (formatMode == 2) {
-            format_inch_only(outputText);
-        }
-        else if (formatMode == 3) {
-            format_fraction(outputText);
-        }
-        else if (formatMode == 4) {
-            format_decimal(outputText);
         }
     }
 
