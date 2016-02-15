@@ -15,6 +15,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Button;
+import android.widget.Toast;
+import android.content.Context;
 
 //TODO oder of operations : multiply / divide  and  add / subtract should run left to right
 
@@ -29,11 +31,10 @@ public class MainActivity extends Activity {
         outState.putString("numeratorInput", numeratorInput);
         outState.putString("inputNumber", inputNumber.toString());
         outState.putString("output", output.toString());
-        outState.putBoolean("feetAdded", feetAdded);
-        outState.putBoolean("inchAdded", inchAdded);
+        outState.putBoolean("addingFeet", addingFeet);
+        outState.putBoolean("addingInch", addingInch);
         outState.putBoolean("addingDenominator", addingDenominator);
         outState.putBoolean("addingNumerator", addingNumerator);
-        outState.putString("units", units);
         TextView outputText = (TextView) findViewById(R.id.outputText);
         outState.putString("uiOutputText", outputText.getText().toString());
         TextView debugText = (TextView) findViewById(R.id.oplist);
@@ -53,11 +54,10 @@ public class MainActivity extends Activity {
             numeratorInput = savedInstanceState.getString("numeratorInput");
             inputNumber = new BigDecimal(savedInstanceState.getString("inputNumber"));
             output = new BigDecimal(savedInstanceState.getString("output"));
-            feetAdded = savedInstanceState.getBoolean("feetAdded");
-            inchAdded = savedInstanceState.getBoolean("inchAdded");
+            addingFeet = savedInstanceState.getBoolean("addingFeet");
+            addingInch = savedInstanceState.getBoolean("addingInch");
             addingDenominator = savedInstanceState.getBoolean("addingDenominator");
             addingNumerator = savedInstanceState.getBoolean("addingNumerator");
-            units = savedInstanceState.getString("units");
             TextView outputText = (TextView) findViewById(R.id.outputText);
             outputText.setText(savedInstanceState.getString("uiOutputText"));
             TextView debugText = (TextView) findViewById(R.id.oplist);
@@ -89,19 +89,17 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-
     ArrayList<String> opList = new ArrayList<>();
     String inputString = "";
     String numeratorInput = "";
-
-    Boolean feetAdded = false;
-    Boolean inchAdded = false;
-    Boolean addingNumerator = false;  // tracks if a fraction numerator is being added
-    Boolean addingDenominator = false;  // tracks if a fraction denonicator is being added
-    String units = "decimal";
-
     BigDecimal inputNumber = new BigDecimal("0");  // for calculating feet / inches
     BigDecimal output = new BigDecimal("0");  // the output of the calc function
+    Boolean feetInchAdded = false;
+    Boolean fractionAdded = false;
+    Boolean addingFeet = false;
+    Boolean addingInch = false;
+    Boolean addingNumerator = false;  // tracks if a fraction numerator is being added
+    Boolean addingDenominator = false;  // tracks if a fraction denominator is being added
 
     public void clickConvert(View view) {
         final String[] convert_items = getResources().getStringArray(R.array.convert_types);
@@ -130,11 +128,12 @@ public class MainActivity extends Activity {
         opList.clear();
         inputString = "";
         numeratorInput = "";
-        feetAdded = false;
-        inchAdded = false;
+        feetInchAdded = false;
+        fractionAdded = false;
+        addingFeet = false;
+        addingInch = false;
         addingDenominator = false;
         addingNumerator = false;
-        units = "decimal";
         inputNumber = BigDecimal.ZERO;
         output = BigDecimal.ZERO;
 
@@ -166,7 +165,8 @@ public class MainActivity extends Activity {
     public void click_feet(View view) {
         TextView units1 = (TextView) findViewById(R.id.outputUnits1);
         if (!inputString.equals("") && !inputString.equals("-")) {
-            feetAdded = true;
+            addingFeet = true;
+            feetInchAdded = true;
             units1.setText("ft");  // TODO string reference
             // multiply input times 12
             BigDecimal feet = new BigDecimal(inputString);
@@ -179,7 +179,8 @@ public class MainActivity extends Activity {
         TextView units2 = (TextView) findViewById(R.id.outputUnits2);
         if (!inputString.equals("") && !inputString.equals("-")) {
             // get current number entry
-            inchAdded = true;
+            addingInch = true;
+            feetInchAdded = true;
             units2.setText("in");  // TODO string reference
             // add input value
             BigDecimal inch = new BigDecimal(inputString);
@@ -207,6 +208,7 @@ public class MainActivity extends Activity {
             fractionDem.setBackgroundResource(R.color.uiHighlight);
             fractionDem.setText("  ");
             addingDenominator = true;
+            fractionAdded = true;
         }
     }
 
@@ -257,7 +259,7 @@ public class MainActivity extends Activity {
         clear_input(view);  // resets outputText and input values
     }
 
-    public void clickCalculate(View view) {
+    public void click_calculate(View view) {
         // add the current concatenated number to opList
         compile_input_number();
         // update the DEBUG window
@@ -285,10 +287,10 @@ public class MainActivity extends Activity {
                 fractionDem.setText(inputString);
             } else if (addingNumerator) {
                 fractionNum.setText(inputString);
-            } else if (inchAdded) {
+            } else if (addingInch) {
                 fractionNum.setText(inputString);
                 addingNumerator = true;
-            } else if (feetAdded) {
+            } else if (addingFeet) {
                 outputInch.setText(inputString);
             } else {
                 outputText.setText(inputString);
@@ -340,8 +342,8 @@ public class MainActivity extends Activity {
         inputString = "";
         numeratorInput = "";
         inputNumber = BigDecimal.ZERO;
-        feetAdded = false;
-        inchAdded = false;
+        addingFeet = false;
+        addingInch = false;
         addingNumerator = false;
         addingDenominator = false;
     }
@@ -411,8 +413,8 @@ public class MainActivity extends Activity {
 
         // if no format mode is defined, check units to determine format mode
         if (formatMode == -1) {
-            if (addingDenominator || feetAdded || inchAdded) {
-                if (feetAdded || inchAdded) {
+            if (fractionAdded || feetInchAdded) {
+                if (feetInchAdded) {
                     formatMode = 0;  // feet and inches mode
                 }
                 else {
@@ -442,13 +444,32 @@ public class MainActivity extends Activity {
     }
 
     public String remove_trailing_zeros(BigDecimal input) {
-        // TODO remove some trailing zeros (4.12030900000 becomes 4.120309)
-        // remove zero value decimals. Example (4.0 becomes 4)
         String outputString = input.toString();
         if (outputString.contains(".")) {
             String[] parts = outputString.split(Pattern.quote("."));
+            // remove zero value decimals. Example (4.0 becomes 4)
             if (new BigDecimal(parts[1]).compareTo(BigDecimal.ZERO) == 0) { // after decimal == 0
                 outputString = parts[0];
+            }
+            // remove excess zeros. Example (4.12030900000 becomes 4.120309)
+            else {
+                // iterate through the decimal part backwards
+                String backwardsDecimal = "";
+                String sReverse = new StringBuilder(parts[1]).reverse().toString();
+                boolean gotValue = false;
+                for (int i = 0; i < sReverse.length(); i++) {
+                    char c = sReverse.charAt(i);
+                    // if a non-zero number has been found, all characters should be added
+                    if (gotValue) {
+                        backwardsDecimal += c;
+                    }
+                    else if (c != '0') {
+                        backwardsDecimal += c;
+                        gotValue = true;  // a non-zero number is found
+                    }
+                }
+                String cleanedDecimal = new StringBuilder(backwardsDecimal).reverse().toString();
+                outputString = parts[0] + "." + cleanedDecimal;
             }
         }
         return outputString;
@@ -491,7 +512,8 @@ public class MainActivity extends Activity {
                 return outputString;
             }
             else {
-                return null;
+                String[] outputString = new String[2];
+                return outputString;
             }
         }
         else {
@@ -517,6 +539,12 @@ public class MainActivity extends Activity {
             integerPart = new BigDecimal(parts[0]);
             fractionPart = decimal_to_fraction(parts[1]);
         }
+
+        Context context = getApplicationContext();
+        String text = output.toString();
+        int duration = Toast.LENGTH_LONG;
+        Toast toast = Toast.makeText(context, fractionPart[0], duration);
+        toast.show();
 
         BigDecimal feetInch[] = integerPart.divideAndRemainder(new BigDecimal("12"));
         // add feet
