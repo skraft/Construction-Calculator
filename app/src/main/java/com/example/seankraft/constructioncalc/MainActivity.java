@@ -89,6 +89,14 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    /*
+    //toast
+    Context context = getApplicationContext();
+    Toast toast = Toast.makeText(context, fractionPart[0], Toast.LENGTH_LONG);
+    toast.show();
+    //end toast
+    */
+
     ArrayList<String> opList = new ArrayList<>();
     String inputString = "";
     String numeratorInput = "";
@@ -193,6 +201,14 @@ public class MainActivity extends Activity {
         TextView fractionNum = (TextView) findViewById(R.id.outputNumerator);
         TextView fractionDem = (TextView) findViewById(R.id.outputDenominator);
         if (!addingNumerator && !addingDenominator) {
+            // first capture any value on the inputString
+            if (!addingFeet || !addingInch) {
+                if (!inputString.equals("") && !inputString.equals("-")) {
+                    // add input value
+                    BigDecimal inputNum = new BigDecimal(inputString);
+                    inputNumber = inputNum.add(inputNumber);
+                }
+            }
             inputString = "";
             // highlight the numerator input
             fractionNum.setBackgroundResource(R.color.uiHighlight);
@@ -371,19 +387,26 @@ public class MainActivity extends Activity {
                 opList.remove(i);
                 opList.add(i, output.toString());
                 opList.remove(i - 1);
-            }
-            // TODO handle divide by zero errors
-            else if (opList.contains("÷")) {
+            } else if (opList.contains("÷")) {
                 int i = opList.indexOf("÷");
                 BigDecimal val1 = new BigDecimal(opList.get(i - 1));
                 BigDecimal val2 = new BigDecimal(opList.get(i + 1));
-                output = val1.divide(val2, 9, BigDecimal.ROUND_HALF_UP).stripTrailingZeros(); // do divide
-                opList.remove(i + 1);
-                opList.remove(i);
-                opList.add(i, output.toString());
-                opList.remove(i - 1);
-            }
-            else if (opList.contains("+")) {
+                // catch divide by zero
+                if (val2.compareTo(BigDecimal.ZERO) == 0) {
+                    Context context = getApplicationContext();
+                    Toast toast = Toast.makeText(context, "Can't Divide by Zero", Toast.LENGTH_LONG);
+                    toast.show();
+                    output = BigDecimal.ZERO;
+                    opList.clear();
+                    break;
+                } else {
+                    output = val1.divide(val2, 9, BigDecimal.ROUND_HALF_UP).stripTrailingZeros();
+                    opList.remove(i + 1);
+                    opList.remove(i);
+                    opList.add(i, output.toString());
+                    opList.remove(i - 1);
+                }
+            } else if (opList.contains("+")) {
                 int i = opList.indexOf("+");
                 BigDecimal val1 = new BigDecimal(opList.get(i - 1));
                 BigDecimal val2 = new BigDecimal(opList.get(i + 1));
@@ -392,8 +415,7 @@ public class MainActivity extends Activity {
                 opList.remove(i);
                 opList.add(i, output.toString());
                 opList.remove(i - 1);
-                }
-            else if (opList.contains("−")) {
+            } else if (opList.contains("−")) {
                 int i = opList.indexOf("−");
                 BigDecimal val1 = new BigDecimal(opList.get(i - 1));
                 BigDecimal val2 = new BigDecimal(opList.get(i + 1));
@@ -476,6 +498,7 @@ public class MainActivity extends Activity {
     }
 
     public String[] decimal_to_fraction(String decimalString) {
+        String[] outputString = new String[2];
         // if the decimal part is > 0
         if (new BigDecimal(decimalString).compareTo(BigDecimal.ZERO) == 1) {  // after decimal > 0
             // create a denominator for the fraction
@@ -508,16 +531,16 @@ public class MainActivity extends Activity {
             }
             // only return a fraction if the numerator is greater then 0
             if (numerator.compareTo(BigDecimal.ZERO) == 1) {
-                String[] outputString = {numerator.toString(), denominator.toString()};
+                outputString[0] = numerator.toString();
+                outputString[1] = denominator.toString();
                 return outputString;
             }
             else {
-                String[] outputString = new String[2];
                 return outputString;
             }
         }
         else {
-            return null;
+            return outputString;
         }
     }
 
@@ -533,18 +556,12 @@ public class MainActivity extends Activity {
         String[] fractionPart = new String[2];
 
         // if there is a decimal point, break the output into parts
-        String outputString = output.toString();
+        String outputString = remove_trailing_zeros(output);
         if (outputString.contains(".")) {
             String[] parts = outputString.split(Pattern.quote("."));
             integerPart = new BigDecimal(parts[0]);
             fractionPart = decimal_to_fraction(parts[1]);
         }
-
-        Context context = getApplicationContext();
-        String text = output.toString();
-        int duration = Toast.LENGTH_LONG;
-        Toast toast = Toast.makeText(context, fractionPart[0], duration);
-        toast.show();
 
         BigDecimal feetInch[] = integerPart.divideAndRemainder(new BigDecimal("12"));
         // add feet
@@ -558,7 +575,7 @@ public class MainActivity extends Activity {
             units2.setText("in"); // TODO string reference
         }
         // add fractions
-        if (fractionPart != null) {
+        if (fractionPart[0] != null && !fractionPart[0].isEmpty()) {
             fractionNum.setText(fractionPart[0]);
             fractionDem.setText(fractionPart[1]);
             units2.setText("in"); // TODO string reference
@@ -590,7 +607,7 @@ public class MainActivity extends Activity {
             }
             outputText.setText(feetOutput);
             // add fraction
-            if (fractionPart != null) {
+            if (fractionPart[0] != null && !fractionPart[0].isEmpty()) {
                 fractionNum.setText(fractionPart[0]);
                 fractionDem.setText(fractionPart[1]);
             }
@@ -620,7 +637,7 @@ public class MainActivity extends Activity {
             inchOutput += remove_trailing_zeros(integerPart);
         }
         // add fraction
-        if (fractionPart != null) {
+        if (fractionPart[0] != null && !fractionPart[0].isEmpty()) {
             inchOutput += " ";
             inchOutput += fractionPart;
         }
@@ -630,24 +647,28 @@ public class MainActivity extends Activity {
 
     public void format_fraction() {
         TextView outputText = (TextView) findViewById(R.id.outputText);
+        TextView fractionNum = (TextView) findViewById(R.id.outputNumerator);
+        TextView fractionDem = (TextView) findViewById(R.id.outputDenominator);
+
         BigDecimal integerPart = output;
         String[] fractionPart = new String[2];
         // if there is a decimal point, break the output into parts
-        String outputString = output.toString();
+        String outputString = remove_trailing_zeros(output);
         if (outputString.contains(".")) {
             String[] parts = outputString.split(Pattern.quote("."));
             integerPart = new BigDecimal(parts[0]);
             fractionPart = decimal_to_fraction(parts[1]);
         }
 
-        String fractionOutput = "";
+        // add integers
         if (integerPart.compareTo(BigDecimal.ZERO) != 0) {
-            fractionOutput += integerPart.toString();
+            outputText.setText(remove_trailing_zeros(integerPart));
         }
-        if (fractionPart != null) {
-            fractionOutput += " " + fractionPart;
+        // add fractions
+        if (fractionPart[0] != null && !fractionPart[0].isEmpty()) {
+            fractionNum.setText(fractionPart[0]);
+            fractionDem.setText(fractionPart[1]);
         }
-        outputText.setText(fractionOutput);
     }
 
     public void format_decimal() {
