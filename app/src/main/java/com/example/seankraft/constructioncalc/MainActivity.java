@@ -316,7 +316,11 @@ public class MainActivity extends Activity {
         // convert opList to a string and display in the debug textView
         String opListString = "";
         for (String op : opList) {
-            opListString += op + " ";
+            if (op.contains("x") || op.contains("÷") || op.contains("+") || op.contains("−")) {
+                opListString += op + " ";
+            } else {
+                opListString += remove_trailing_zeros(op) + " ";
+            }
         }
         debugText.setText(opListString);
     }
@@ -362,6 +366,22 @@ public class MainActivity extends Activity {
         addingInch = false;
         addingNumerator = false;
         addingDenominator = false;
+    }
+
+    public void clear_views() {
+        TextView outputText = (TextView) findViewById(R.id.outputText);
+        TextView units1 = (TextView) findViewById(R.id.outputUnits1);
+        TextView outputInch = (TextView) findViewById(R.id.outputInch);
+        TextView fractionNum = (TextView) findViewById(R.id.outputNumerator);
+        TextView fractionDem = (TextView) findViewById(R.id.outputDenominator);
+        TextView units2 = (TextView) findViewById(R.id.outputUnits2);
+
+        outputText.setText("");
+        units1.setText("");
+        outputInch.setText("");
+        fractionNum.setText("");
+        fractionDem.setText("");
+        units2.setText("");
     }
 
     public void clean_op_list() {
@@ -465,8 +485,8 @@ public class MainActivity extends Activity {
         }
     }
 
-    public String remove_trailing_zeros(BigDecimal input) {
-        String outputString = input.toString();
+    public String remove_trailing_zeros(String outputString) {
+//        String outputString = input.toString();
         if (outputString.contains(".")) {
             String[] parts = outputString.split(Pattern.quote("."));
             // remove zero value decimals. Example (4.0 becomes 4)
@@ -545,6 +565,7 @@ public class MainActivity extends Activity {
     }
 
     public void format_feet_and_inch() {
+        clear_views();
         TextView outputText = (TextView) findViewById(R.id.outputText);
         TextView units1 = (TextView) findViewById(R.id.outputUnits1);
         TextView outputInch = (TextView) findViewById(R.id.outputInch);
@@ -556,7 +577,7 @@ public class MainActivity extends Activity {
         String[] fractionPart = new String[2];
 
         // if there is a decimal point, break the output into parts
-        String outputString = remove_trailing_zeros(output);
+        String outputString = remove_trailing_zeros(output.toString());
         if (outputString.contains(".")) {
             String[] parts = outputString.split(Pattern.quote("."));
             integerPart = new BigDecimal(parts[0]);
@@ -566,12 +587,12 @@ public class MainActivity extends Activity {
         BigDecimal feetInch[] = integerPart.divideAndRemainder(new BigDecimal("12"));
         // add feet
         if (feetInch[0].compareTo(BigDecimal.ZERO) != 0) {
-            outputText.setText(remove_trailing_zeros(feetInch[0]));
+            outputText.setText(remove_trailing_zeros(feetInch[0].toString()));
             units1.setText("ft");  // TODO string reference
         }
         // add inches
         if (feetInch[1].compareTo(BigDecimal.ZERO) != 0) {
-            outputInch.setText(remove_trailing_zeros(feetInch[1]));
+            outputInch.setText(remove_trailing_zeros(feetInch[1].toString()));
             units2.setText("in"); // TODO string reference
         }
         // add fractions
@@ -583,6 +604,7 @@ public class MainActivity extends Activity {
     }
 
     public void format_feet_only() {
+        clear_views();
         TextView outputText = (TextView) findViewById(R.id.outputText);
         TextView fractionNum = (TextView) findViewById(R.id.outputNumerator);
         TextView fractionDem = (TextView) findViewById(R.id.outputDenominator);
@@ -614,38 +636,44 @@ public class MainActivity extends Activity {
             units2.setText("ft");  // TODO string reference
         }
         else {
-            outputText.setText(remove_trailing_zeros(feet));
+            outputText.setText(remove_trailing_zeros(feet.toString()));
             units2.setText("ft");  // TODO string reference
         }
     }
 
     public void format_inch_only() {
-        TextView outputText = (TextView) findViewById(R.id.outputText);
+        clear_views();
+        TextView outputInch = (TextView) findViewById(R.id.outputInch);
+        TextView fractionNum = (TextView) findViewById(R.id.outputNumerator);
+        TextView fractionDem = (TextView) findViewById(R.id.outputDenominator);
+        TextView units2 = (TextView) findViewById(R.id.outputUnits2);
+
         BigDecimal integerPart = output;
         String[] fractionPart = new String[2];
+
         // if there is a decimal point, break the output into parts
-        String outputString = output.toString();
+        String outputString = remove_trailing_zeros(output.toString());
         if (outputString.contains(".")) {
             String[] parts = outputString.split(Pattern.quote("."));
             integerPart = new BigDecimal(parts[0]);
             fractionPart = decimal_to_fraction(parts[1]);
         }
 
-        String inchOutput = "";
         // add inches
         if (integerPart.compareTo(BigDecimal.ZERO) != 0) {
-            inchOutput += remove_trailing_zeros(integerPart);
+            outputInch.setText(remove_trailing_zeros(integerPart.toString()));
+            units2.setText("in"); // TODO string reference
         }
-        // add fraction
+        // add fractions
         if (fractionPart[0] != null && !fractionPart[0].isEmpty()) {
-            inchOutput += " ";
-            inchOutput += fractionPart;
+            fractionNum.setText(fractionPart[0]);
+            fractionDem.setText(fractionPart[1]);
+            units2.setText("in"); // TODO string reference
         }
-        inchOutput += '"';
-        outputText.setText(inchOutput);
     }
 
     public void format_fraction() {
+        clear_views();
         TextView outputText = (TextView) findViewById(R.id.outputText);
         TextView fractionNum = (TextView) findViewById(R.id.outputNumerator);
         TextView fractionDem = (TextView) findViewById(R.id.outputDenominator);
@@ -653,7 +681,7 @@ public class MainActivity extends Activity {
         BigDecimal integerPart = output;
         String[] fractionPart = new String[2];
         // if there is a decimal point, break the output into parts
-        String outputString = remove_trailing_zeros(output);
+        String outputString = remove_trailing_zeros(output.toString());
         if (outputString.contains(".")) {
             String[] parts = outputString.split(Pattern.quote("."));
             integerPart = new BigDecimal(parts[0]);
@@ -662,7 +690,7 @@ public class MainActivity extends Activity {
 
         // add integers
         if (integerPart.compareTo(BigDecimal.ZERO) != 0) {
-            outputText.setText(remove_trailing_zeros(integerPart));
+            outputText.setText(remove_trailing_zeros(integerPart.toString()));
         }
         // add fractions
         if (fractionPart[0] != null && !fractionPart[0].isEmpty()) {
@@ -672,8 +700,9 @@ public class MainActivity extends Activity {
     }
 
     public void format_decimal() {
+        clear_views();
         TextView outputText = (TextView) findViewById(R.id.outputText);
-        String cleanedOutput = remove_trailing_zeros(output);
+        String cleanedOutput = remove_trailing_zeros(output.toString());
         outputText.setText(cleanedOutput);
     }
 }
