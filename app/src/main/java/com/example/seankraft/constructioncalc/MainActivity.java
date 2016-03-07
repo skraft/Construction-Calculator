@@ -191,8 +191,16 @@ public class MainActivity extends Activity {
             feetInchAdded = true;
             units2.setText("in");  // TODO string reference
             // add input value
-            BigDecimal inch = new BigDecimal(inputString);
-            inputNumber = inch.add(inputNumber);
+            // check for fraction input
+            if (addingDenominator && !inputString.equals("")) {
+                BigDecimal numerator = new BigDecimal(numeratorInput);
+                BigDecimal denominator = new BigDecimal(inputString);
+                inputNumber = numerator.divide(denominator, 9, BigDecimal.ROUND_HALF_UP).add(inputNumber);
+            }
+            else {
+                BigDecimal inch = new BigDecimal(inputString);
+                inputNumber = inch.add(inputNumber);
+            }
         }
         inputString = "";
     }
@@ -217,14 +225,21 @@ public class MainActivity extends Activity {
         }
         else if (addingNumerator && !addingDenominator) {
             // store the numerator string before clearing
-            numeratorInput = inputString;
-            inputString = "";
-            // highlight the denominator for input
-            fractionNum.setBackgroundResource(R.color.uiDefault);
-            fractionDem.setBackgroundResource(R.color.uiHighlight);
-            fractionDem.setText("  ");
-            addingDenominator = true;
-            fractionAdded = true;
+            if (!inputString.equals("")) {
+                numeratorInput = inputString;
+                inputString = "";
+                // highlight the denominator for input
+                fractionNum.setBackgroundResource(R.color.uiDefault);
+                fractionDem.setBackgroundResource(R.color.uiHighlight);
+                fractionDem.setText("  ");
+                addingDenominator = true;
+                fractionAdded = true;
+            }
+            else {
+                Context context = getApplicationContext();
+                Toast toast = Toast.makeText(context, "Please enter a numerator", Toast.LENGTH_LONG);
+                toast.show();
+            }
         }
     }
 
@@ -327,7 +342,7 @@ public class MainActivity extends Activity {
 
     public void compile_input_number() {
         // This function compiles any feet, inch, and fraction input into the opList
-        if (addingDenominator) {
+        if (addingDenominator && !inputString.equals("")) {
             BigDecimal numerator = new BigDecimal(numeratorInput);
             BigDecimal denominator = new BigDecimal(inputString);
             inputNumber = numerator.divide(denominator, 9, BigDecimal.ROUND_HALF_UP).add(inputNumber);
