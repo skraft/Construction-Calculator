@@ -101,6 +101,7 @@ public class MainActivity extends Activity {
     String inputString = "";
     String numeratorInput = "";
     BigDecimal inputNumber = new BigDecimal("0");  // for calculating feet / inches
+    Boolean inputNegative = false;
     BigDecimal output = new BigDecimal("0");  // the output of the calc function
     Boolean feetInchAdded = false;
     Boolean fractionAdded = false;
@@ -483,25 +484,21 @@ public class MainActivity extends Activity {
             }
         }
 
-        if (formatMode == 0) {
-            format_feet_and_inch();
-        }
-        else if (formatMode == 1) {
-            format_feet_only();
-        }
-        else if (formatMode == 2) {
-            format_inch_only();
-        }
-        else if (formatMode == 3) {
-            format_fraction();
-        }
-        else if (formatMode == 4) {
-            format_decimal();
+        switch (formatMode) {
+            case 0: format_feet_and_inch();
+                    break;
+            case 1: format_feet_only();
+                    break;
+            case 2: format_inch_only();
+                    break;
+            case 3: format_fraction();
+                    break;
+            case 4: format_decimal();
+                    break;
         }
     }
 
     public String remove_trailing_zeros(String outputString) {
-//        String outputString = input.toString();
         if (outputString.contains(".")) {
             String[] parts = outputString.split(Pattern.quote("."));
             // remove zero value decimals. Example (4.0 becomes 4)
@@ -701,6 +698,12 @@ public class MainActivity extends Activity {
             String[] parts = outputString.split(Pattern.quote("."));
             integerPart = new BigDecimal(parts[0]);
             fractionPart = decimal_to_fraction(parts[1]);
+        }
+
+        // check for 1/1 fractions (happens with numbers that are very close to an integer: 1.99999)
+        if (fractionPart[0].equals("1") && fractionPart[1].equals("1")) {
+            integerPart = integerPart.add(BigDecimal.ONE);  // add the fraction into the integer part
+            fractionPart[0] = null;  // nullify the fraction
         }
 
         // add integers
